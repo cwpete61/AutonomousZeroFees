@@ -1,25 +1,52 @@
-import { Controller, Post, Body, Headers, BadRequestException } from '@nestjs/common';
+import { Controller, Post, Body, Headers, BadRequestException, RawBodyRequest, Req } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { LeadsService } from '../leads/leads.service';
 import { LeadStatus } from '@agency/db';
+import Stripe from 'stripe';
 
 @ApiTags('webhooks')
 @Controller('webhooks')
 export class WebhooksController {
+  private stripe: Stripe;
+
   constructor(
     private configService: ConfigService,
     private leadsService: LeadsService,
-  ) { }
+  ) {
+    this.stripe = new Stripe(this.configService.get<string>('STRIPE_SECRET_KEY') || '', {
+      apiVersion: '2024-04-10' as any,
+    });
+  }
 
   @Post('stripe')
-  @ApiOperation({ summary: 'Handle Stripe webhook events' })
-  async handleStripe(@Body() payload: any, @Headers('stripe-signature') signature: string) {
-    // In production, verify signature with Stripe library
-    console.log('[Webhook] Stripe event received:', payload.type);
+  @ApiOperation({ summary: 'Handle Stripe webhook events with signature verification' })
+  async handleStripe(@Req() req: RawBodyRequest<Request>, @Headers('stripe-signature') signature: string) {
+    const webhookSecret = this.configService.get<string>('STRIPE_WEBHOOK_SECRET');
 
-    if (payload.type === 'checkout.session.completed') {
-      const session = payload.data.object;
+    let event: Stripe.Event;
+
+    try {
+      if (webhookSecret && signature) {
+        // Use rawBody for verification
+        event = this.stripe.webhooks.constructEvent(
+          (req as any).rawBody,
+          signature,
+          webhookSecret,
+        );
+      } else {
+        // Fallback for development (if secret not set)
+        event = req.body as any;
+      }
+    } catch (err) {
+      console.error(`[Webhook Error] Signature verification failed: ${err.message}`);
+      throw new BadRequestException(`Webhook Error: ${err.message}`);
+    }
+
+    console.log('[Webhook] Stripe event verified:', event.type);
+
+    if (event.type === 'checkout.session.completed') {
+      const session = event.data.object as Stripe.Checkout.Session;
       const leadId = session.client_reference_id;
 
       if (leadId) {

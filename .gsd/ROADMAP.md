@@ -32,17 +32,17 @@
 ---
 
 ### Phase 3: API Layer — Core Endpoints
-**Status**: 🔲 Not started
+**Status**: ✅ Complete
 **Goal**: REST API with auth, CRUD for all core entities, webhook ingestion, Swagger docs complete.
 **Must-haves**:
-- [ ] Auth module (JWT, session management)
-- [ ] Leads CRUD endpoints
-- [ ] Businesses CRUD endpoints
-- [ ] Proposals & Invoices endpoints
-- [ ] Approval queue endpoints
-- [ ] Webhook handlers (Stripe, email replies)
-- [ ] Swagger docs for all endpoints
-- [ ] Rate limiting active on all routes
+- [x] Auth module (JWT, session management)
+- [x] Leads CRUD endpoints
+- [x] Businesses CRUD endpoints
+- [x] Proposals & Invoices endpoints
+- [x] Approval queue endpoints
+- [x] Webhook handlers (Stripe, email replies)
+- [x] Swagger docs for all endpoints
+- [x] Rate limiting active on all routes
 
 ---
 
