@@ -1,0 +1,24 @@
+{
+    "name": "@agency/agents",
+    "version": "0.1.0",
+    "private": true,
+    "main": "specialist-agents.js",
+    "types": "specialist-agents.d.ts",
+    "files": [
+        "specialist-agents.js",
+        "scout-agent",
+        "outreach-agent",
+        "design-preview-agent",
+        "sales-close-agent",
+        "web-build-agent",
+        "client-success-agent",
+        "content-agent",
+        "error-agent",
+        "code-agent",
+        "email-writing-agent",
+        "onboarding-agent",
+        "finance-agent",
+        "audit-agent",
+        "nurture-agent"
+    ]
+}

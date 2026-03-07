@@ -30,6 +30,15 @@ packages/db/generated/
 *.log
 logs/
 
+# Backups
+backups/
+tmp/
+
+# Temp Content Files
+content.md
+email.md
+marketing-content.md
+
 # Backups (keep the structure, ignore data)
 backups/db/*.sql
 backups/db/*.dump

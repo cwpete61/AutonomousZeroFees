@@ -14,7 +14,10 @@ export class RedisEventBus implements OnModuleDestroy {
         const redisUrl = this.configService.get<string>('REDIS_URL') || 'redis://localhost:6379';
 
         this.publisher = new Redis(redisUrl);
-        this.subscriber = new Redis(redisUrl);
+        this.subscriber = new Redis(redisUrl, {
+            enableReadyCheck: false,
+            maxRetriesPerRequest: null,
+        });
 
         this.subscriber.on('message', (channel, message) => {
             this.handleIncomingMessage(channel, message);

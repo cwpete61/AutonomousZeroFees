@@ -1,13 +1,18 @@
 {
-    "version":  "0.1.0",
-    "name":  "@agency/orchestrator",
-    "main":  "dist/index.js",
-    "scripts":  {
-                    "typecheck":  "tsc --noEmit",
-                    "clean":  "rm -rf dist",
-                    "build":  "tsc",
-                    "dev":  "tsc --watch"
-                },
-    "types":  "dist/index.d.ts",
-    "private":  true
+    "version": "0.1.0",
+    "name": "@agency/orchestrator",
+    "main": "dist/index.js",
+    "scripts": {
+        "typecheck": "tsc --noEmit",
+        "clean": "rm -rf dist",
+        "build": "tsc",
+        "dev": "tsc --watch"
+    },
+    "types": "dist/index.d.ts",
+    "private": true,
+    "devDependencies": {
+        "@nestjs/common": "^10.4.22",
+        "@prisma/client": "^5.14.0",
+        "@types/node": "^20.14.0"
+    }
 }

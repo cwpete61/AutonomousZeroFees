@@ -13,6 +13,7 @@ import { AiModule } from './modules/ai/ai.module';
 import { EmailSequencesModule } from './modules/email-sequences/email-sequences.module';
 import { BillingModule } from './modules/billing/billing.module';
 import { ApprovalsModule } from './modules/approvals/approvals.module';
+import { EventsModule } from '@agency/events';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { ApprovalsModule } from './modules/approvals/approvals.module';
     EmailSequencesModule,
     BillingModule,
     ApprovalsModule,
+    EventsModule,
     // OutreachModule,
     // NotificationsModule,
   ],

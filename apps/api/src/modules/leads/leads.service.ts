@@ -2,10 +2,14 @@ import { Injectable, UnprocessableEntityException, NotFoundException } from '@ne
 import { PrismaService } from '../prisma/prisma.service';
 import { Lead, Prisma, LeadStatus } from '@agency/db';
 import { isValidTransition } from '@agency/orchestrator';
+import { RedisEventBus, EVENTS } from '@agency/events';
 
 @Injectable()
 export class LeadsService {
-  constructor(private prisma: PrismaService) { }
+  constructor(
+    private prisma: PrismaService,
+    private eventBus: RedisEventBus,
+  ) { }
 
   async findAll(filters?: { stage?: LeadStatus; campaignId?: string }) {
     const where: Prisma.LeadWhereInput = {};
@@ -29,10 +33,19 @@ export class LeadsService {
   }
 
   async create(data: any) {
-    return this.prisma.lead.create({
+    const lead = await this.prisma.lead.create({
       data,
       include: { business: true }
     });
+
+    await this.eventBus.publish({
+      eventType: EVENTS.LEAD_CREATED,
+      timestamp: new Date().toISOString(),
+      correlationId: `lead-create-${lead.id}`,
+      payload: lead,
+    });
+
+    return lead;
   }
 
   async update(id: string, data: any) {
@@ -54,7 +67,7 @@ export class LeadsService {
     }
 
     // Use a transaction to ensure both lead update and audit log are successful
-    return this.prisma.$transaction(async (tx) => {
+    const result = await this.prisma.$transaction(async (tx) => {
       const updatedLead = await tx.lead.update({
         where: { id },
         data: { status: toStage },
@@ -73,6 +86,21 @@ export class LeadsService {
 
       return updatedLead;
     });
+
+    // Emit event after successful transaction
+    await this.eventBus.publish({
+      eventType: EVENTS.LEAD_STATUS_CHANGED,
+      timestamp: new Date().toISOString(),
+      correlationId: `lead-stage-${id}-${Date.now()}`,
+      payload: {
+        leadId: id,
+        from: fromStage,
+        to: toStage,
+        lead: result,
+      },
+    });
+
+    return result;
   }
 
   async getTimeline(id: string) {

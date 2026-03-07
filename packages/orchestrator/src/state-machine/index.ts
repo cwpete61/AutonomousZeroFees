@@ -3,7 +3,7 @@
  * State machine and workflow controller.
  */
 
-import type { LeadStatus } from '@prisma/client';
+import { LeadStatus } from '@agency/db';
 
 /**
  * Valid state transitions for the lead pipeline.

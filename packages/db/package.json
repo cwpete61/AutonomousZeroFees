@@ -2,10 +2,10 @@
   "name": "@agency/db",
   "version": "0.1.0",
   "private": true,
-  "main": "generated/client/index.js",
-  "types": "generated/client/index.d.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
-    "build": "prisma generate",
+    "build": "prisma generate && tsc",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
@@ -19,6 +19,8 @@
     "@prisma/client": "^5.14.0"
   },
   "devDependencies": {
+    "@nestjs/common": "^10.3.0",
+    "@nestjs/core": "^10.3.0",
     "prisma": "^5.14.0",
     "typescript": "^5.5.0",
     "ts-node": "^10.9.0",
