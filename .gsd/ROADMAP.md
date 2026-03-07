@@ -47,19 +47,19 @@
 ---
 
 ### Phase 4: Event Bus & Orchestrator Integration
-**Status**: 🔲 Not started
+**Status**: ✅ Complete
 **Goal**: Redis event bus wired, orchestrator state machine enforced via API, domain events flowing.
 **Must-haves**:
-- [ ] Redis Pub/Sub event bus implementation
-- [ ] State machine validation on all lead transitions
-- [ ] Domain events emitting on state changes
-- [ ] Audit log entries on all mutations
-- [ ] Orchestrator routing integrated with BullMQ queues
+- [x] Redis Pub/Sub event bus implementation
+- [x] State machine validation on all lead transitions
+- [x] Domain events emitting on state changes
+- [x] Audit log entries on all mutations
+- [x] Orchestrator routing integrated with BullMQ queues
 
 ---
 
 ### Phase 5: Worker Queues & Agent Wiring
-**Status**: 🔲 Not started
+**Status**: 🏗️ In progress
 **Goal**: BullMQ queues processing agent jobs, all 9 agents connected to real queue processors.
 **Must-haves**:
 - [ ] BullMQ queue setup (one queue per agent class)
