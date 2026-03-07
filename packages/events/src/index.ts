@@ -3,14 +3,16 @@
  * Lightweight domain event system backed by Redis Pub/Sub.
  */
 
-export type EventHandler<T = unknown> = (event: {
+export interface DomainEvent<T = any> {
   eventType: string;
   timestamp: string;
   correlationId: string;
   actorId?: string;
   actorType?: 'USER' | 'AGENT' | 'SYSTEM';
   payload: T;
-}) => Promise<void>;
+}
+
+export type EventHandler<T = any> = (event: DomainEvent<T>) => Promise<void>;
 
 // Event type constants
 export const EVENTS = {
@@ -33,3 +35,6 @@ export const EVENTS = {
 } as const;
 
 export type EventType = (typeof EVENTS)[keyof typeof EVENTS];
+
+export * from './redis-event-bus.service';
+export * from './events.module';
