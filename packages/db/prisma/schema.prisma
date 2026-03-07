@@ -1,0 +1,740 @@
+// Autonomous Web Agency — Prisma Schema v1.1
+// PostgreSQL + pgvector
+
+generator client {
+  provider        = "prisma-client-js"
+  output          = "../generated/client"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  extensions = [vector]
+}
+
+// ─── ENUMS ──────────────────────────────────────────────────────────
+
+enum UserRole {
+  SUPER_ADMIN
+  OPS_ADMIN
+  SALES_ADMIN
+  FULFILLMENT_ADMIN
+  SUPPORT_ADMIN
+  CLIENT_OWNER
+  CLIENT_EDITOR
+  CLIENT_VIEWER
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+enum AdminType {
+  SUPER
+  OPS
+  SALES
+  FULFILLMENT
+  SUPPORT
+}
+
+enum ClientRole {
+  OWNER
+  EDITOR
+  VIEWER
+}
+
+enum ActorType {
+  USER
+  AGENT
+  SYSTEM
+}
+
+enum LeadStatus {
+  DISCOVERED
+  RESEARCHED
+  AUDITED
+  QUALIFIED
+  DISQUALIFIED
+  ENRICHED
+  ENRICHMENT_FAILED
+  OUTREACH_PENDING
+  OUTREACH_APPROVED
+  OUTREACH_SENT
+  OUTREACH_FAILED
+  REPLIED
+  DEMO_PENDING
+  DEMO_SENT
+  DEMO_FAILED
+  PROPOSAL_SENT
+  INVOICE_SENT
+  PAID
+  BUILD_STARTED
+  BUILD_FAILED
+  REVIEW_PENDING
+  DELIVERED
+  CLOSED_WON
+  CLOSED_LOST
+  RE_ENGAGE
+}
+
+enum LeadPriority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum QualificationStatus {
+  PENDING
+  QUALIFIED
+  DISQUALIFIED
+  NEEDS_REVIEW
+}
+
+enum OutreachStatus {
+  DRAFT
+  PENDING_REVIEW
+  APPROVED
+  SENDING
+  SENT
+  FAILED
+  REPLIED
+  BOUNCED
+}
+
+enum DemoGenerationStatus {
+  PENDING
+  GENERATING
+  COMPLETED
+  FAILED
+}
+
+enum ReviewStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  REVISION_NEEDED
+}
+
+enum ProposalStatus {
+  DRAFT
+  SENT
+  VIEWED
+  ACCEPTED
+  REJECTED
+  EXPIRED
+}
+
+enum InvoiceStatus {
+  DRAFT
+  ISSUED
+  SENT
+  PAID
+  OVERDUE
+  CANCELLED
+  REFUNDED
+}
+
+enum OnboardingStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  STALLED
+}
+
+enum ProjectStatus {
+  PLANNING
+  IN_PROGRESS
+  REVIEW
+  REVISION
+  STAGING
+  DELIVERED
+  LAUNCHED
+  CLOSED
+}
+
+enum RevisionStatus {
+  REQUESTED
+  IN_PROGRESS
+  COMPLETED
+  REJECTED
+}
+
+enum CommunicationChannel {
+  EMAIL
+  PHONE
+  SMS
+  WHATSAPP
+  SLACK
+  IN_APP
+}
+
+enum MessageDirection {
+  INBOUND
+  OUTBOUND
+}
+
+enum MessageType {
+  EMAIL
+  CHAT
+  NOTE
+  SYSTEM
+}
+
+enum ContentAssetType {
+  SERVICE_PAGE
+  LOCAL_PAGE
+  BLOG_POST
+  FAQ
+  CTA_BLOCK
+  META_DESCRIPTION
+  SOCIAL_POST
+}
+
+enum AgentRunStatus {
+  QUEUED
+  RUNNING
+  COMPLETED
+  FAILED
+  CANCELLED
+  NEEDS_REVIEW
+}
+
+enum ErrorSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum IncidentSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum IncidentStatus {
+  OPEN
+  INVESTIGATING
+  MITIGATING
+  RESOLVED
+  CLOSED
+}
+
+enum MaintenanceTaskType {
+  QUEUE_RETRY_SWEEP
+  DEAD_LETTER_REVIEW
+  STALE_LOCK_CLEANUP
+  ORPHANED_ASSET_SCAN
+  FAILED_WEBHOOK_RETRY
+  BACKUP_VERIFICATION
+  RESTORE_VERIFICATION
+  STORAGE_CONSISTENCY
+  VECTOR_INDEX_MAINTENANCE
+  EXPIRED_DEMO_CLEANUP
+  INACTIVE_LEAD_CLEANUP
+  INCIDENT_ARCHIVE
+}
+
+enum MaintenanceStatus {
+  SCHEDULED
+  RUNNING
+  COMPLETED
+  FAILED
+  SKIPPED
+}
+
+enum BackupType {
+  FULL_DB
+  INCREMENTAL_ASSET
+  PRE_MIGRATION
+  PRE_RELEASE
+  MANUAL_SNAPSHOT
+}
+
+enum BackupStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+  FAILED
+  VERIFIED
+}
+
+enum RestoreStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+  FAILED
+  VERIFIED
+}
+
+enum ApprovalType {
+  OUTREACH
+  PREVIEW
+  DEMO
+  INVOICE
+  DELIVERY
+}
+
+enum ApprovalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  EXPIRED
+}
+
+enum ApprovalPriority {
+  LOW
+  NORMAL
+  HIGH
+  URGENT
+}
+
+enum CampaignStatus {
+  ACTIVE
+  PAUSED
+  COMPLETED
+  ARCHIVED
+}
+
+enum NotificationChannel {
+  IN_APP
+  EMAIL
+  SLACK
+}
+
+// ─── AUTH & USERS ───────────────────────────────────────────────────
+
+model User {
+  id           String     @id @default(cuid())
+  email        String     @unique
+  passwordHash String?
+  fullName     String?
+  role         UserRole
+  status       UserStatus @default(ACTIVE)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  adminProfile   AdminUser?
+  clientProfiles ClientUser[]
+  sessions       Session[]
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model AdminUser {
+  id        String    @id @default(cuid())
+  userId    String    @unique
+  adminType AdminType
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model ClientUser {
+  id         String     @id @default(cuid())
+  userId     String
+  clientId   String
+  clientRole ClientRole
+  createdAt  DateTime   @default(now())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, clientId])
+}
+
+// ─── BUSINESS & LEADS ───────────────────────────────────────────────
+
+model Business {
+  id               String   @id @default(cuid())
+  name             String
+  niche            String
+  websiteUrl       String?
+  phone            String?
+  publicEmail      String?
+  city             String?
+  state            String?
+  country          String   @default("US")
+  googleProfileUrl String?
+  source           String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  leads Lead[]
+}
+
+model Lead {
+  id                  String              @id @default(cuid())
+  businessId          String
+  status              LeadStatus
+  priority            LeadPriority?
+  source              String?
+  discoveryNotes      String?
+  qualificationScore  Float?
+  qualificationStatus QualificationStatus?
+  currentOwnerAgent   String?
+  campaignId          String?
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+
+  business          Business           @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  campaign          Campaign?          @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+  audit             WebsiteAudit?
+  contacts          Contact[]
+  outreachSequences OutreachSequence[]
+  demoAssets        DemoAsset[]
+  proposals         Proposal[]
+  invoices          Invoice[]
+  conversations     Conversation[]
+  client            Client?
+}
+
+// ─── AUDIT & CONTACTS ───────────────────────────────────────────────
+
+model WebsiteAudit {
+  id                 String   @id @default(cuid())
+  leadId             String   @unique
+  visualQualityScore Int?
+  usabilityScore     Int?
+  trustScore         Int?
+  conversionScore    Int?
+  localSeoScore      Int?
+  technicalScore     Int?
+  contentScore       Int?
+  summary            String?
+  issueListJson      Json?
+  opportunitySummary String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  lead Lead @relation(fields: [leadId], references: [id], onDelete: Cascade)
+}
+
+model Contact {
+  id                   String   @id @default(cuid())
+  leadId               String
+  fullName             String?
+  role                 String?
+  email                String
+  emailConfidence      Float?
+  alternateChannels    Json?
+  personalizationNotes String?
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  lead Lead @relation(fields: [leadId], references: [id], onDelete: Cascade)
+}
+
+// ─── OUTREACH, DEMO, CONVERSATION ──────────────────────────────────
+
+model OutreachSequence {
+  id            String         @id @default(cuid())
+  leadId        String
+  status        OutreachStatus
+  subjectLine   String?
+  firstEmail    String?
+  followupOne   String?
+  followupTwo   String?
+  lastSentAt    DateTime?
+  nextSendAt    DateTime?
+  replyDetected Boolean        @default(false)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  lead Lead @relation(fields: [leadId], references: [id], onDelete: Cascade)
+}
+
+model DemoAsset {
+  id                String               @id @default(cuid())
+  leadId            String
+  blurredPreviewUrl String?
+  fullPreviewUrl    String?
+  beforeAfterUrl    String?
+  hostedDemoUrl     String?
+  generationStatus  DemoGenerationStatus
+  reviewStatus      ReviewStatus
+  createdAt         DateTime             @default(now())
+  updatedAt         DateTime             @updatedAt
+
+  lead Lead @relation(fields: [leadId], references: [id], onDelete: Cascade)
+}
+
+model Conversation {
+  id             String               @id @default(cuid())
+  leadId         String?
+  clientId       String?
+  channel        CommunicationChannel
+  direction      MessageDirection
+  messageType    MessageType
+  content        String
+  classification String?
+  createdAt      DateTime             @default(now())
+
+  lead   Lead?   @relation(fields: [leadId], references: [id], onDelete: SetNull)
+  client Client? @relation(fields: [clientId], references: [id], onDelete: SetNull)
+}
+
+// ─── SALES & BILLING ────────────────────────────────────────────────
+
+model Proposal {
+  id          String         @id @default(cuid())
+  leadId      String
+  packageName String
+  scopeJson   Json
+  price       Decimal        @db.Decimal(10, 2)
+  status      ProposalStatus
+  sentAt      DateTime?
+  approvedAt  DateTime?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  lead Lead @relation(fields: [leadId], references: [id], onDelete: Cascade)
+}
+
+model Invoice {
+  id          String        @id @default(cuid())
+  leadId      String
+  proposalId  String?
+  amount      Decimal       @db.Decimal(10, 2)
+  currency    String        @default("USD")
+  status      InvoiceStatus
+  paymentLink String?
+  externalRef String?
+  issuedAt    DateTime?
+  paidAt      DateTime?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  lead Lead @relation(fields: [leadId], references: [id], onDelete: Cascade)
+}
+
+// ─── CLIENT & PROJECT DELIVERY ──────────────────────────────────────
+
+model Client {
+  id                      String               @id @default(cuid())
+  businessId              String
+  leadId                  String               @unique
+  communicationPreference CommunicationChannel @default(EMAIL)
+  onboardingStatus        OnboardingStatus
+  activeProjectId         String?
+  createdAt               DateTime             @default(now())
+  updatedAt               DateTime             @updatedAt
+
+  lead          Lead           @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  users         ClientUser[]
+  projects      Project[]
+  conversations Conversation[]
+}
+
+model Project {
+  id                   String        @id @default(cuid())
+  clientId             String
+  scopeJson            Json
+  status               ProjectStatus
+  sitemapJson          Json?
+  contentChecklistJson Json?
+  stagingUrl           String?
+  deliveryUrl          String?
+  launchDate           DateTime?
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime      @updatedAt
+
+  client        Client            @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  revisions     RevisionRequest[]
+  contentAssets ContentAsset[]
+}
+
+model RevisionRequest {
+  id          String         @id @default(cuid())
+  projectId   String
+  requestText String
+  status      RevisionStatus
+  roundNumber Int
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+// ─── CONTENT ────────────────────────────────────────────────────────
+
+model ContentAsset {
+  id           String           @id @default(cuid())
+  projectId    String?
+  clientId     String?
+  assetType    ContentAssetType
+  title        String?
+  body         String?
+  metadataJson Json?
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  project Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+}
+
+// ─── OPERATIONS ─────────────────────────────────────────────────────
+
+model AgentRun {
+  id           String         @id @default(cuid())
+  agentName    String
+  targetType   String?
+  targetId     String?
+  status       AgentRunStatus
+  startedAt    DateTime
+  finishedAt   DateTime?
+  durationMs   Int?
+  inputJson    Json?
+  outputJson   Json?
+  errorSummary String?
+  createdAt    DateTime       @default(now())
+}
+
+model ErrorEvent {
+  id          String        @id @default(cuid())
+  severity    ErrorSeverity
+  module      String
+  code        String?
+  message     String
+  contextJson Json?
+  createdAt   DateTime      @default(now())
+}
+
+model Incident {
+  id         String           @id @default(cuid())
+  title      String
+  severity   IncidentSeverity
+  status     IncidentStatus
+  rootCause  String?
+  resolution String?
+  openedAt   DateTime         @default(now())
+  resolvedAt DateTime?
+}
+
+model MaintenanceTask {
+  id           String              @id @default(cuid())
+  taskType     MaintenanceTaskType
+  status       MaintenanceStatus
+  scheduledFor DateTime?
+  startedAt    DateTime?
+  finishedAt   DateTime?
+  resultJson   Json?
+  createdAt    DateTime            @default(now())
+}
+
+model BackupJob {
+  id           String       @id @default(cuid())
+  backupType   BackupType
+  status       BackupStatus
+  startedAt    DateTime?
+  finishedAt   DateTime?
+  checksum     String?
+  artifactPath String?
+  createdAt    DateTime     @default(now())
+}
+
+model RestoreEvent {
+  id          String        @id @default(cuid())
+  backupJobId String
+  status      RestoreStatus
+  startedAt   DateTime?
+  finishedAt  DateTime?
+  notes       String?
+  createdAt   DateTime      @default(now())
+}
+
+model EmbeddingRecord {
+  id           String                  @id @default(cuid())
+  recordType   String
+  recordId     String
+  content      String
+  embedding    Unsupported("vector")
+  metadataJson Json?
+  createdAt    DateTime                @default(now())
+}
+
+// ─── NEW v1.1 MODELS ────────────────────────────────────────────────
+
+model AuditLog {
+  id            String    @id @default(cuid())
+  actorId       String?
+  actorType     ActorType
+  action        String
+  targetType    String?
+  targetId      String?
+  beforeJson    Json?
+  afterJson     Json?
+  metadata      Json?
+  correlationId String?
+  ipAddress     String?
+  createdAt     DateTime  @default(now())
+
+  @@index([targetType, targetId])
+  @@index([actorId])
+  @@index([createdAt])
+}
+
+model ApprovalRequest {
+  id              String           @id @default(cuid())
+  approvalType    ApprovalType
+  targetType      String
+  targetId        String
+  leadId          String?
+  requestedBy     String?
+  reviewedBy      String?
+  status          ApprovalStatus
+  priority        ApprovalPriority @default(NORMAL)
+  notes           String?
+  rejectionReason String?
+  requestedAt     DateTime         @default(now())
+  reviewedAt      DateTime?
+  expiresAt       DateTime?
+
+  @@index([status, approvalType])
+  @@index([leadId])
+}
+
+model Campaign {
+  id           String         @id @default(cuid())
+  name         String
+  niche        String
+  geography    String
+  sourceConfig Json?
+  thresholds   Json?
+  status       CampaignStatus
+  leadsFound   Int            @default(0)
+  lastRunAt    DateTime?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  leads Lead[]
+
+  @@index([status])
+}
+
+model Notification {
+  id        String              @id @default(cuid())
+  userId    String
+  title     String
+  body      String?
+  channel   NotificationChannel
+  category  String?
+  linkUrl   String?
+  isRead    Boolean             @default(false)
+  readAt    DateTime?
+  createdAt DateTime            @default(now())
+
+  @@index([userId, isRead])
+}

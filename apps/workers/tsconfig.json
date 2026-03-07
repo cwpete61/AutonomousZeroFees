@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "declaration": true,
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "target": "ES2021",
+    "sourceMap": true,
+    "outDir": "./dist",
+    "baseUrl": "./",
+    "incremental": true,
+    "skipLibCheck": true,
+    "strictNullChecks": true,
+    "noImplicitAny": true,
+    "forceConsistentCasingInFileNames": true,
+    "paths": {
+      "@agency/db": ["../../packages/db"],
+      "@agency/orchestrator": ["../../packages/orchestrator/src"],
+      "@agency/types": ["../../packages/types/src"],
+      "@agency/logger": ["../../packages/logger/src"],
+      "@agency/config": ["../../packages/config/src"],
+      "@agency/events": ["../../packages/events/src"]
+    }
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}

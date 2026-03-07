@@ -1,0 +1,13 @@
+{
+    "version":  "0.1.0",
+    "name":  "@agency/website-audit-service",
+    "main":  "dist/index.js",
+    "scripts":  {
+                    "typecheck":  "tsc --noEmit",
+                    "clean":  "rm -rf dist",
+                    "build":  "tsc",
+                    "dev":  "tsc --watch"
+                },
+    "types":  "dist/index.d.ts",
+    "private":  true
+}

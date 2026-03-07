@@ -1,0 +1,10 @@
+{
+    "version": "0.1.0",
+    "name": "@agency/onboarding-agent",
+    "main": "onboarding-agent.js",
+    "private": true,
+    "dependencies": {
+        "@agency/logger": "workspace:*",
+        "@agency/config": "workspace:*"
+    }
+}

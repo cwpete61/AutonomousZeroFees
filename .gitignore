@@ -1,0 +1,48 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build outputs
+dist/
+.next/
+.turbo/
+out/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Prisma
+packages/db/generated/
+
+# Logs
+*.log
+logs/
+
+# Backups (keep the structure, ignore data)
+backups/db/*.sql
+backups/db/*.dump
+backups/uploads/*
+backups/config/*.bak
+!backups/**/.gitkeep
+
+# Docker
+docker-compose.override.yml
+
+# Testing
+coverage/
+.nyc_output/
+
+# Sentry
+.sentryclirc

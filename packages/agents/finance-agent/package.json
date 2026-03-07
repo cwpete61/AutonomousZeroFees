@@ -1,0 +1,10 @@
+{
+    "version": "0.1.0",
+    "name": "@agency/finance-agent",
+    "main": "finance-agent.js",
+    "private": true,
+    "dependencies": {
+        "@agency/logger": "workspace:*",
+        "@agency/config": "workspace:*"
+    }
+}

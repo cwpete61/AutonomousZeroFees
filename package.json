@@ -1,0 +1,35 @@
+{
+  "name": "autonomous-web-agency",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Containerized Multi-Agent Platform for Lead Generation, Outreach, Sales, Fulfillment, Content, Reliability, and Client Operations",
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "test:integration": "turbo run test:integration",
+    "typecheck": "turbo run typecheck",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
+    "db:generate": "pnpm --filter @agency/db generate",
+    "db:migrate": "pnpm --filter @agency/db migrate:dev",
+    "db:push": "pnpm --filter @agency/db push",
+    "db:seed": "pnpm --filter @agency/db seed",
+    "db:studio": "pnpm --filter @agency/db studio",
+    "backup:run": "pnpm --filter @agency/workers backup:run",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down",
+    "docker:build": "docker compose build",
+    "docker:logs": "docker compose logs -f",
+    "clean": "turbo run clean && rm -rf node_modules"
+  },
+  "devDependencies": {
+    "turbo": "^2.0.0",
+    "prettier": "^3.0.0",
+    "typescript": "^5.4.0"
+  },
+  "packageManager": "pnpm@9.0.0",
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
