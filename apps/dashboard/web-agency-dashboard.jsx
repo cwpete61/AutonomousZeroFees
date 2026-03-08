@@ -256,6 +256,7 @@ const API_COST_MODELS = {
     icon: '🧠',
     models: [
       { id: 'claude-3-5-sonnet', name: 'Claude 3.5 Sonnet', costPerLead: 0.03, description: 'Best for reasoning' },
+      { id: 'claude-sonnet-4-6', name: 'Claude Sonnet 4.6', costPerLead: 0.045, description: 'Only use this model to build proposed website' },
       { id: 'claude-3-opus', name: 'Claude 3 Opus', costPerLead: 0.15, description: 'Maximum capabilities' },
       { id: 'claude-3-haiku', name: 'Claude 3 Haiku', costPerLead: 0.005, description: 'Near-instant responses' }
     ]
@@ -271,6 +272,17 @@ const API_COST_MODELS = {
   resend: { name: 'Resend (Email)', costPerLead: 0.01, multiplier: 1.0, available: 3000, icon: '📧' },
   gtmetrix: { name: 'GTMetrix', costPerLead: 0.01, multiplier: 1.0, available: 1000, icon: '📈', link: 'https://gtmetrix.com/api/docs/2.0/' },
   pingdom: { name: 'Pingdom', costPerLead: 0.01, multiplier: 1.0, available: 1000, icon: '⏱️', link: 'https://www.pingdom.com/api/' },
+  runware: { 
+    name: 'Runware (AI Images)', 
+    icon: '🖼️',
+    link: 'https://runware.ai/',
+    models: [
+      { id: 'runware:400@2', name: 'Runware 400@2', costPerLead: 0.00078, description: 'Ultra-fast basic generation' },
+      { id: 'qwen-image-2512', name: 'Qwen-Image-2512', costPerLead: 0.035, description: 'High-fidelity cinematic' },
+      { id: 'seedream-5-lite', name: 'Seedream 5.0 Lite', costPerLead: 0.035, description: 'Artistic realism' },
+      { id: 'grok-imagine', name: 'Grok Imagine', costPerLead: 0.02, description: 'Creative and diverse' }
+    ]
+  },
 };
 
 function getScoreClass(score) {
@@ -337,6 +349,7 @@ export default function Dashboard() {
   const [isWorkflowTesting, setIsWorkflowTesting] = useState(false);
   const [pipelineFitMode, setPipelineFitMode] = useState(false);
   const [apiKeys, setApiKeys] = useState({});
+  const [apiToggles, setApiToggles] = useState({});
   const [testStatus, setTestStatus] = useState({});
   const [selectedModels, setSelectedModels] = useState({
     openai: 'gpt-4o',
@@ -439,6 +452,14 @@ export default function Dashboard() {
             const parsed = JSON.parse(savedLeads);
             if (parsed && typeof parsed === 'object') setLeadSettings(parsed);
           } catch (e) { console.error("Error parsing leads:", e); }
+        }
+
+        const savedApiToggles = localStorage.getItem('orbis_api_toggles');
+        if (savedApiToggles) {
+          try {
+            const parsed = JSON.parse(savedApiToggles);
+            if (parsed && typeof parsed === 'object') setApiToggles(parsed);
+          } catch (e) { console.error("Error parsing api toggles:", e); }
         }
       }
     } catch (err) {
@@ -556,6 +577,23 @@ export default function Dashboard() {
     setLeadSettings(prev => {
       const next = { ...prev, [id]: prev?.[id] === false ? true : false };
       if (typeof window !== 'undefined') localStorage.setItem('orbis_leads_active', JSON.stringify(next));
+      return next;
+    });
+  };
+
+  const handleToggleApi = (id) => {
+    setApiToggles(prev => {
+      const nextValue = !prev?.[id];
+      const next = { ...prev, [id]: nextValue };
+      localStorage.setItem('orbis_api_toggles', JSON.stringify(next));
+      
+      // Persist to backend
+      fetch(`${API_URL}/settings`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ [`api_active_${id}`]: nextValue ? 'true' : 'false' }),
+      }).catch(err => console.error('Failed to persist API toggle to backend:', err));
+      
       return next;
     });
   };
@@ -1035,6 +1073,33 @@ export default function Dashboard() {
             boxShadow: isSet ? '0 0 10px rgba(34,197,94,0.1)' : 'none'
           }}>
             {isSet ? 'Online' : 'Offline'}
+          </div>
+          
+          {/* On/Off Toggle */}
+          <div 
+            onClick={() => handleToggleApi(id)}
+            style={{
+              width: '34px',
+              height: '18px',
+              background: apiToggles[id] ? 'linear-gradient(135deg, #22c55e, #10b981)' : 'rgba(148, 163, 184, 0.2)',
+              borderRadius: '20px',
+              position: 'relative',
+              cursor: 'pointer',
+              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+              padding: '2px',
+              border: apiToggles[id] ? 'none' : '1px solid rgba(255,255,255,0.1)'
+            }}
+          >
+            <div style={{
+              width: '14px',
+              height: '14px',
+              background: '#fff',
+              borderRadius: '50%',
+              position: 'absolute',
+              left: apiToggles[id] ? '18px' : '2px',
+              transition: 'all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55)',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+            }} />
           </div>
         </div>
 
@@ -1802,7 +1867,7 @@ export default function Dashboard() {
                     <div style={{ flex: 1, height: '1px', background: 'linear-gradient(90deg, rgba(99,102,241,0.2), transparent)' }} />
                   </div>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(8, 1fr)', gap: '12px' }}>
-                    {['openai', 'claude'].map(renderApiCard)}
+                    {['openai', 'claude', 'runware'].map(renderApiCard)}
                   </div>
                 </div>
 
@@ -1827,7 +1892,7 @@ export default function Dashboard() {
                     <div>
                       <h3 style={{ margin: '0 0 8px 0' }}>End-to-End Encryption</h3>
                       <p style={{ margin: 0, color: t.textSecondary, fontSize: '0.9rem', lineHeight: '1.6' }}>
-                        All API keys are stored securely in your dashboard's local vault. Keys are never transmitted to our telemetry servers and are only used for direct agent communication with the respective service providers.
+                        All API keys are stored securely in your dashboard&apos;s local vault. Keys are never transmitted to our telemetry servers and are only used for direct agent communication with the respective service providers.
                       </p>
                     </div>
                   </div>
@@ -2192,14 +2257,14 @@ export default function Dashboard() {
                                                   <span style={{ fontWeight: 600, fontSize: '0.85rem' }}>Outreach Email #1</span>
                                                   <span style={{ fontSize: '0.75rem', color: t.textMuted }}>2 days ago</span>
                                                 </div>
-                                                <div style={{ fontSize: '0.8rem', color: t.textSecondary, fontStyle: 'italic' }}>"I noticed your site is losing customers because it takes 4.2s to load on mobile..."</div>
+                                                <div style={{ fontSize: '0.8rem', color: t.textSecondary, fontStyle: 'italic' }}>&quot;I noticed your site is losing customers because it takes 4.2s to load on mobile...&quot;</div>
                                               </div>
                                               <div style={{ padding: '16px', background: t.bg, borderRadius: '12px', border: `1px solid ${t.borderSubtle}` }}>
                                                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
                                                   <span style={{ fontWeight: 600, fontSize: '0.85rem' }}>Client Replied</span>
                                                   <span style={{ fontSize: '0.75rem', color: t.textMuted }}>1 day ago</span>
                                                 </div>
-                                                <div style={{ fontSize: '0.8rem', color: t.textSecondary }}>"Interested, show me more"</div>
+                                                <div style={{ fontSize: '0.8rem', color: t.textSecondary }}>&quot;Interested, show me more&quot;</div>
                                               </div>
                                             </div>
                                           </div>
