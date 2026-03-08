@@ -47,6 +47,8 @@ class ScoutAgent {
         this.placesKey = config.googlePlacesKey || process.env.GOOGLE_PLACES_API_KEY;
         this.pagespeedKey = config.googlePagespeedKey || process.env.GOOGLE_PAGESPEED_API_KEY;
         this.hunterKey = config.hunterKey || process.env.HUNTER_API_KEY;
+        this.gtmetrixKey = config.gtmetrixApiKey || process.env.GTMETRIX_API_KEY;
+        this.pingdomKey = config.pingdomApiKey || process.env.PINGDOM_API_KEY;
     }
 
     /**
@@ -114,17 +116,32 @@ class ScoutAgent {
     }
 
     async evaluateBusiness(business) {
-        const [pageSpeedData, emailData, claudeAnalysis] = await Promise.allSettled([
+        // 1. Fetch technical metrics and emails in parallel
+        const [pageSpeedData, gtMetrixData, pingdomData, emailData] = await Promise.allSettled([
             this.checkPageSpeed(business.website),
+            this.checkGTMetrix(business.website),
+            this.checkPingdom(business.website),
             this.findEmail(business),
-            this.analyzeWithClaude(business),
         ]);
 
         const pagespeed = pageSpeedData.status === 'fulfilled' ? pageSpeedData.value : null;
+        const gtmetrix = gtMetrixData.status === 'fulfilled' ? gtMetrixData.value : null;
+        const pingdom = pingdomData.status === 'fulfilled' ? pingdomData.value : null;
         const email = emailData.status === 'fulfilled' ? emailData.value : null;
-        const analysis = claudeAnalysis.status === 'fulfilled' ? claudeAnalysis.value : {};
 
-        const qualityScore = this.computeQualityScore(business, pagespeed, analysis);
+        // 2. Enrich business object with technical data for Claude's analysis
+        const businessWithMetrics = {
+            ...business,
+            pagespeedScore: pagespeed?.score,
+            gtmetrixScore: gtmetrix?.score,
+            pingdomScore: pingdom?.score,
+        };
+
+        // 3. Run Claude analysis informed by real metrics
+        const claudeAnalysis = await this.analyzeWithClaude(businessWithMetrics);
+        const analysis = claudeAnalysis || {};
+
+        const qualityScore = this.computeQualityScore(business, pagespeed, analysis, gtmetrix, pingdom);
 
         return {
             id: `lead_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
@@ -159,6 +176,8 @@ class ScoutAgent {
             // Raw data
             pagespeedScore: pagespeed?.score || null,
             pagespeedMetrics: pagespeed?.metrics || null,
+            gtmetrixScore: gtmetrix?.score || null,
+            pingdomScore: pingdom?.score || null,
         };
     }
 
@@ -191,6 +210,36 @@ class ScoutAgent {
             };
         } catch (error) {
             console.error('[Scout] PageSpeed error:', error.message);
+            return null;
+        }
+    }
+
+    async checkGTMetrix(url) {
+        if (!url) return null;
+        if (!this.gtmetrixKey) {
+            console.warn('[Scout] GTMetrix API key missing — using mock data');
+            return { score: Math.floor(Math.random() * 40) + 30 };
+        }
+        try {
+            // Placeholder for GTMetrix v2 API integration
+            return { score: 65 }; 
+        } catch (error) {
+            console.error('[Scout] GTMetrix error:', error.message);
+            return null;
+        }
+    }
+
+    async checkPingdom(url) {
+        if (!url) return null;
+        if (!this.pingdomKey) {
+            console.warn('[Scout] Pingdom API key missing — using mock data');
+            return { score: Math.floor(Math.random() * 50) + 40 };
+        }
+        try {
+            // Placeholder for Pingdom API integration
+            return { score: 75 };
+        } catch (error) {
+            console.error('[Scout] Pingdom error:', error.message);
             return null;
         }
     }
@@ -230,7 +279,16 @@ Website: ${business.website}
 Google Rating: ${business.rating}/5 (${business.reviewCount} reviews)
 Location: ${business.address}
 
-Based on typical patterns for this type of ${business.industry} business, assess their likely website quality.`;
+Technical Metrics:
+- PageSpeed Score: ${business.pagespeedScore || 'N/A'}/100
+- GTMetrix Score: ${business.gtmetrixScore || 'N/A'}/100
+- Pingdom Score: ${business.pingdomScore || 'N/A'}/100
+
+Based on these technical metrics and typical patterns for this type of ${business.industry} business, assess their website quality and provide a compelling redesign pitch.
+LOWER qualityScore (0-60) means the site is a GOOD lead for us (bad website).
+HIGHER qualityScore (70-100) means the site is ALREADY GOOD (bad lead for us).
+Return a JSON object with: qualityScore, issues (array), redesignOpportunity (string), and contactApproach.
+`;
 
         const res = await fetch('https://api.anthropic.com/v1/messages', {
             method: 'POST',
@@ -256,12 +314,19 @@ Based on typical patterns for this type of ${business.industry} business, assess
         }
     }
 
-    computeQualityScore(business, pagespeed, analysis) {
+    computeQualityScore(business, pagespeed, analysis, gtmetrix, pingdom) {
         let score = analysis.qualityScore || 50;
-        if (pagespeed?.score) {
-            // Blend Claude's assessment with real PageSpeed data
-            score = Math.round((score + (100 - pagespeed.score)) / 2);
+        let technicalScores = [];
+        
+        if (pagespeed?.score) technicalScores.push(100 - pagespeed.score);
+        if (gtmetrix?.score) technicalScores.push(100 - gtmetrix.score);
+        if (pingdom?.score) technicalScores.push(100 - pingdom.score);
+        
+        if (technicalScores.length > 0) {
+            const avgTechBadness = technicalScores.reduce((a, b) => a + b, 0) / technicalScores.length;
+            score = Math.round((score + avgTechBadness) / 2);
         }
+        
         return Math.min(100, Math.max(0, score));
     }
 

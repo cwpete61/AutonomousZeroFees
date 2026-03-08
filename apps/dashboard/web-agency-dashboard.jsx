@@ -269,6 +269,8 @@ const API_COST_MODELS = {
   stripe: { name: 'Stripe (Payments)', costPerLead: 0.00, multiplier: 0.0, available: '∞', icon: '💳' },
   whatsapp: { name: 'WhatsApp Business', costPerLead: 0.03, multiplier: 1.1, available: 5000, icon: '💬' },
   resend: { name: 'Resend (Email)', costPerLead: 0.01, multiplier: 1.0, available: 3000, icon: '📧' },
+  gtmetrix: { name: 'GTMetrix', costPerLead: 0.01, multiplier: 1.0, available: 1000, icon: '📈', link: 'https://gtmetrix.com/api/docs/2.0/' },
+  pingdom: { name: 'Pingdom', costPerLead: 0.01, multiplier: 1.0, available: 1000, icon: '⏱️', link: 'https://www.pingdom.com/api/' },
 };
 
 function getScoreClass(score) {
@@ -996,52 +998,56 @@ export default function Dashboard() {
     const costDisplay = hasModels ? (selectedModel?.costPerLead || 0) : api.costPerLead;
 
     return (
-      <div key={id} style={{ 
-        padding: '24px', 
-        background: t.card, 
-        border: `1px solid ${status === 'success' ? '#22c55e' : t.border}`, 
-        borderRadius: '20px',
+      <div key={id} className="api-card-premium" style={{ 
+        padding: '20px', 
+        background: isDark ? 'rgba(30, 41, 59, 0.4)' : 'rgba(255, 255, 255, 0.8)', 
+        backdropFilter: 'blur(16px)',
+        border: `1px solid ${status === 'success' ? '#22c55e' : 'rgba(99, 102, 241, 0.15)'}`, 
+        borderRadius: '24px',
         display: 'flex',
         flexDirection: 'column',
-        gap: '16px',
-        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-        boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+        gap: '14px',
+        transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+        boxShadow: status === 'success' ? '0 0 20px rgba(34, 197, 94, 0.15)' : '0 8px 32px rgba(0,0,0,0.12)',
         position: 'relative',
-        overflow: 'hidden'
+        overflow: 'hidden',
+        minWidth: 0
       }}>
+        {/* Subtle internal glow */}
+        <div style={{ position: 'absolute', top: '-50%', left: '-50%', width: '200%', height: '200%', background: 'radial-gradient(circle, rgba(99,102,241,0.03) 0%, transparent 70%)', pointerEvents: 'none' }} />
+        
         {status === 'success' && (
-          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '4px', background: '#22c55e' }} />
+          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '3px', background: 'linear-gradient(90deg, #22c55e, #10b981)', zIndex: 2 }} />
         )}
         
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-          <div style={{ fontSize: '2rem' }}>{api.icon}</div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative', zIndex: 1 }}>
+          <div style={{ fontSize: '1.8rem', filter: 'drop-shadow(0 0 10px rgba(99,102,241,0.2))' }}>{api.icon}</div>
           <div style={{ 
             padding: '4px 10px', 
-            borderRadius: '20px', 
-            fontSize: '0.65rem', 
-            fontWeight: 800, 
-            background: isSet ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.1)', 
+            borderRadius: '12px', 
+            fontSize: '0.6rem', 
+            fontWeight: 900, 
+            background: isSet ? 'rgba(34,197,94,0.12)' : 'rgba(239,68,68,0.08)', 
             color: isSet ? '#22c55e' : '#ef4444',
-            border: `1px solid ${isSet ? 'rgba(34,197,94,0.2)' : 'rgba(239,68,68,0.2)'}`,
-            textTransform: 'uppercase'
+            border: `1px solid ${isSet ? 'rgba(34,197,94,0.2)' : 'rgba(239,68,68,0.15)'}`,
+            textTransform: 'uppercase',
+            letterSpacing: '0.05em',
+            boxShadow: isSet ? '0 0 10px rgba(34,197,94,0.1)' : 'none'
           }}>
-            {isSet ? 'Connected' : 'Not Set'}
+            {isSet ? 'Online' : 'Offline'}
           </div>
         </div>
 
-        <div>
-          <div style={{ fontWeight: 800, fontSize: '1.05rem', marginBottom: '4px' }}>{api.name}</div>
-          <div style={{ fontSize: '0.75rem', color: t.textMuted }}>
-            {costDisplay > 0 ? `$${costDisplay}/lead` : 'System Level'} • {api.available || 0} remaining
-            {api.link && (
-              <a href={api.link} target="_blank" rel="noopener noreferrer" style={{ marginLeft: '8px', color: '#6366f1', textDecoration: 'none' }}>Docs ↗</a>
-            )}
+        <div style={{ position: 'relative', zIndex: 1 }}>
+          <div style={{ fontWeight: 800, fontSize: '1rem', marginBottom: '2px', color: t.text, letterSpacing: '-0.02em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{api.name}</div>
+          <div style={{ fontSize: '0.65rem', color: t.textMuted, fontWeight: 500 }}>
+            {costDisplay > 0 ? `$${costDisplay}` : 'Standard'} <span style={{ opacity: 0.4 }}>|</span> {api.available || 0} hits
           </div>
         </div>
 
         {hasModels && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            <label style={{ fontSize: '0.7rem', color: t.textSecondary, fontWeight: 600 }}>Model Selection</label>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', position: 'relative', zIndex: 1 }}>
+            <label style={{ fontSize: '0.65rem', color: t.textSecondary, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.02em' }}>Variant</label>
             <select 
               value={selectedModelId}
               onChange={(e) => {
@@ -1050,54 +1056,62 @@ export default function Dashboard() {
                 localStorage.setItem('orbis_api_models', JSON.stringify(newModels));
               }}
               style={{ 
-                padding: '10px', 
-                background: t.bg, 
+                padding: '8px 10px', 
+                background: isDark ? 'rgba(15, 23, 42, 0.4)' : 'rgba(241, 245, 249, 0.8)', 
                 border: `1px solid ${t.borderSubtle}`, 
                 borderRadius: '10px', 
                 color: t.text, 
-                fontSize: '0.8rem',
+                fontSize: '0.75rem',
                 outline: 'none',
-                cursor: 'pointer'
+                cursor: 'pointer',
+                fontWeight: 600,
+                appearance: 'none'
               }}
             >
               {api.models.map(m => (
-                <option key={m.id} value={m.id}>{m.name} (${m.costPerLead})</option>
+                <option key={m.id} value={m.id}>{m.name}</option>
               ))}
             </select>
-            <div style={{ fontSize: '0.65rem', color: t.textMuted }}>{selectedModel?.description}</div>
           </div>
         )}
 
-        <div style={{ position: 'relative', marginTop: (hasModels ? '0' : 'auto') }}>
+        <div style={{ position: 'relative', marginTop: (hasModels ? '0' : 'auto'), zIndex: 1 }}>
           <input 
             type="password" 
             value={apiKeys[id] || ''} 
             onChange={(e) => setApiKeys(prev => ({ ...prev, [id]: e.target.value }))}
-            placeholder={`Enter ${api.name} Key...`}
+            placeholder='API Key'
+            className="premium-input-glass"
             style={{ 
               width: '100%', 
-              padding: '12px 40px 12px 14px', 
-              background: t.bg, 
+              padding: '10px 14px', 
+              background: isDark ? 'rgba(15, 23, 42, 0.4)' : 'rgba(241, 245, 249, 0.8)', 
               border: `1px solid ${t.borderSubtle}`, 
               borderRadius: '12px', 
               color: t.text, 
-              fontSize: '0.85rem',
+              fontSize: '0.75rem',
               outline: 'none',
-              transition: 'border 0.2s'
+              transition: 'all 0.2s',
+              fontWeight: 500
             }}
           />
           <button 
             onClick={() => handleSaveApiKey(id, apiKeys[id])}
             style={{ 
               position: 'absolute', 
-              right: '8px', 
+              right: '6px', 
               top: '50%', 
               transform: 'translateY(-50%)',
-              background: 'transparent',
+              background: 'rgba(99, 102, 241, 0.1)',
               border: 'none',
+              borderRadius: '8px',
               cursor: 'pointer',
-              padding: '8px',
-              opacity: 0.7
+              padding: '6px',
+              color: '#6366f1',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transition: 'all 0.2s'
             }}
             title="Save Key"
           >
@@ -1108,24 +1122,28 @@ export default function Dashboard() {
         <button 
           onClick={() => handleTestApiConnection(id)}
           disabled={!apiKeys[id] || status === 'testing'}
+          className={status === 'success' ? '' : 'premium-test-button'}
           style={{ 
             width: '100%', 
-            padding: '12px', 
-            background: status === 'testing' ? t.barBg : (status === 'success' ? '#22c55e' : 'transparent'), 
-            color: (status === 'success' || status === 'testing') ? '#fff' : '#6366f1', 
-            border: (status === 'success' || status === 'testing') ? 'none' : `1.5px solid #6366f1`,
+            padding: '10px', 
+            background: status === 'testing' ? t.barBg : (status === 'success' ? 'linear-gradient(135deg, #22c55e, #10b981)' : 'linear-gradient(135deg, #6366f1, #8b5cf6)'), 
+            color: '#fff',
+            border: 'none',
             borderRadius: '12px', 
-            fontWeight: 700, 
-            fontSize: '0.8rem',
+            fontWeight: 800, 
+            fontSize: '0.75rem',
             cursor: 'pointer',
-            transition: 'all 0.2s',
+            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: '8px'
+            gap: '8px',
+            boxShadow: status === 'success' ? '0 4px 12px rgba(34, 197, 94, 0.3)' : (status === 'testing' ? 'none' : '0 4px 12px rgba(99, 102, 241, 0.3)'),
+            textTransform: 'uppercase',
+            letterSpacing: '0.05em'
           }}
         >
-          {status === 'testing' ? '🚥 Verifying...' : (status === 'success' ? '✓ Verified' : 'Test Connection')}
+          {status === 'testing' ? 'Verifying...' : (status === 'success' ? '✓ Ready' : 'Test Heartbeat')}
         </button>
       </div>
     );
@@ -1783,7 +1801,7 @@ export default function Dashboard() {
                     <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#6366f1' }}>LLMs</h3>
                     <div style={{ flex: 1, height: '1px', background: 'linear-gradient(90deg, rgba(99,102,241,0.2), transparent)' }} />
                   </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(8, 1fr)', gap: '12px' }}>
                     {['openai', 'claude'].map(renderApiCard)}
                   </div>
                 </div>
@@ -1794,10 +1812,11 @@ export default function Dashboard() {
                     <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: t.textSecondary }}>Service Providers</h3>
                     <div style={{ flex: 1, height: '1px', background: `linear-gradient(90deg, ${t.border}, transparent)` }} />
                   </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(8, 1fr)', gap: '12px' }}>
                     {[
                       'dataseo', 'pagespeed', 'hunter', 'instantly', 
-                      'reoon', 'twilio', 'stripe', 'whatsapp', 'resend'
+                      'reoon', 'twilio', 'stripe', 'whatsapp', 'resend',
+                      'gtmetrix', 'pingdom'
                     ].map(renderApiCard)}
                   </div>
                 </div>
@@ -2550,7 +2569,28 @@ export default function Dashboard() {
         )
       }
 
-      <style dangerouslySetInnerHTML={{ __html: `* { box-sizing: border-box; } body { margin: 0; }` }} />
+      <style dangerouslySetInnerHTML={{ __html: `
+        * { box-sizing: border-box; } 
+        body { margin: 0; }
+        .api-card-premium:hover {
+          transform: translateY(-8px) scale(1.02);
+          border-color: rgba(99, 102, 241, 0.5) !important;
+          box-shadow: 0 20px 40px rgba(0,0,0,0.3), 0 0 15px rgba(99, 102, 241, 0.2) !important;
+        }
+        .premium-input-glass:focus {
+          border-color: #6366f1 !important;
+          background: rgba(15, 23, 42, 0.6) !important;
+          box-shadow: 0 0 10px rgba(99, 102, 241, 0.2);
+        }
+        .premium-test-button:hover {
+          filter: brightness(1.2);
+          transform: translateY(-2px);
+          box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4) !important;
+        }
+        .premium-test-button:active {
+          transform: translateY(0);
+        }
+      ` }} />
     </div>
   );
 }

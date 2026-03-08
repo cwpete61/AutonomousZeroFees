@@ -170,6 +170,20 @@
 - [x] Refactor Job Queue into a dedicated "Job Queue" tab/page
 - [x] Add "Delete" button to campaign cards
 
+
+---
+
+### Phase 13: Scout Agent Enhancements
+**Status**: 🔄 In Progress
+**Objective**: Integrate GTMetrix and Pingdom to improve website quality heuristics for the Scout Agent.
+**Depends on**: Phase 12
+
+**Tasks**:
+- [ ] Add GTMetrix & Pingdom API input cards to Dashboard UI settings.
+- [ ] Update `scout-agent.js` to run `checkGTMetrix(url)` and `checkPingdom(url)`.
+- [ ] Incorporate GTMetrix and Pingdom stats into the lead's `qualityScore` algorithm.
+- [ ] Pass the new metrics to Claude to generate more specific outreach copy.
+
 **Verification**:
-- [x] Verify scheduling a campaign moves it to the Job Queue
-- [x] Verify deleting a campaign removes it from the list and storage
+- [ ] API keys map successfully in dashboard UI and save to database.
+- [ ] Scout Agent diagnostic successfully pulls performance/uptime metrics and populates the `issues` list payload.

@@ -5,7 +5,7 @@ module.exports = {
   moduleFileExtensions: ['js', 'json', 'ts'],
   transform: {
     '^.+\\.ts$': ['ts-jest', {
-      tsconfig: 'packages/agents/tsconfig.json',
+      tsconfig: 'tsconfig.json',
     }],
     '^.+\\.js$': 'babel-jest',
   },
