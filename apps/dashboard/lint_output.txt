@@ -1,0 +1,6 @@
+
+C:\Antigravity\AutonomousWebSales\apps\dashboard\web-agency-dashboard.jsx
+  523:6  warning  React Hook useEffect has a missing dependency: 'API_URL'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+✖ 1 problem (0 errors, 1 warning)
+

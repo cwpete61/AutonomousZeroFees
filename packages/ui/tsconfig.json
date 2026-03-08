@@ -19,11 +19,11 @@
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
     "paths": {
-      "@agency/db": ["../../db"],
-      "@agency/types": ["../../types/src"],
-      "@agency/logger": ["../../logger/src"],
-      "@agency/config": ["../../config/src"],
-      "@agency/events": ["../../events/src"]
+      "@agency/db": ["../db"],
+      "@agency/types": ["../types/src"],
+      "@agency/logger": ["../logger/src"],
+      "@agency/config": ["../config/src"],
+      "@agency/events": ["../events/src"]
     }
   },
   "include": ["src/**/*"],

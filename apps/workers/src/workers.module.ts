@@ -8,7 +8,7 @@ import { HealthController } from './health.controller';
 import { EventsModule } from '@agency/events';
 import { OrchestratorModule } from '@agency/orchestrator';
 import { DbModule, PrismaService } from '@agency/db';
-import { ScoutAgent, OutreachAgent } from '@agency/agents';
+import { ScoutAgent, OutreachAgent, NurtureAgent } from '@agency/agents';
 import { WorkflowListener } from './runners/workflow.listener';
 import { ScoutProcessor } from './jobs/scout.processor';
 import { AuditProcessor } from './jobs/audit.processor';
@@ -19,6 +19,7 @@ import { ContentProcessor } from './jobs/content.processor';
 import { WebBuildProcessor } from './jobs/web-build.processor';
 import { ClientSuccessProcessor } from './jobs/client-success.processor';
 import { ErrorProcessor } from './jobs/error.processor';
+import { NurtureProcessor } from './jobs/nurture.processor';
 import { secretsLoader } from '@agency/utils';
 
 @Module({
@@ -52,6 +53,7 @@ import { secretsLoader } from '@agency/utils';
       { name: 'sales-close-queue' },
       { name: 'client-success-queue' },
       { name: 'error-queue' },
+      { name: 'nurture-queue' },
     ),
 
     // Bull Board Monitoring UI
@@ -70,6 +72,7 @@ import { secretsLoader } from '@agency/utils';
       { name: 'sales-close-queue', adapter: BullAdapter },
       { name: 'client-success-queue', adapter: BullAdapter },
       { name: 'error-queue', adapter: BullAdapter },
+      { name: 'nurture-queue', adapter: BullAdapter },
     ),
 
     EventsModule,
@@ -88,6 +91,7 @@ import { secretsLoader } from '@agency/utils';
     WebBuildProcessor,
     ClientSuccessProcessor,
     ErrorProcessor,
+    NurtureProcessor,
     {
       provide: ScoutAgent,
       useFactory: (prisma: PrismaService) => new ScoutAgent({ db: prisma }),
@@ -96,6 +100,10 @@ import { secretsLoader } from '@agency/utils';
     {
       provide: OutreachAgent,
       useValue: new OutreachAgent(),
+    },
+    {
+      provide: NurtureAgent,
+      useValue: new NurtureAgent(),
     },
   ],
 })

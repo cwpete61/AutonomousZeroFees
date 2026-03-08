@@ -56,7 +56,11 @@ export class AuditAgent {
     performAudit(url: string): Promise<any>;
     generateProblemReport(audit: any): Promise<any>;
 }
-export class NurtureAgent { }
+export class NurtureAgent {
+    constructor(config?: any);
+    findNurtureTargets(leads: any[]): Promise<any[]>;
+    generateValueDrop(lead: any): Promise<any>;
+}
 
 export const WEBSITE_QUALITY_HEURISTICS: any;
 export const EMAIL_SEQUENCES: any;

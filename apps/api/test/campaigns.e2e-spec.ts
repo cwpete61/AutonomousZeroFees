@@ -17,7 +17,7 @@ describe('CampaignsController (e2e)', () => {
   const mockCampaign = {
     id: 'camp-123',
     name: 'Test Campaign',
-    status: 'DRAFT',
+    status: 'ACTIVE',
     niche: 'HVAC',
     geography: 'Miami, FL',
     createdAt: new Date().toISOString(),
@@ -36,6 +36,9 @@ describe('CampaignsController (e2e)', () => {
           findUnique: jest.fn().mockResolvedValue(mockCampaign),
           update: jest.fn().mockResolvedValue(mockCampaign),
           delete: jest.fn().mockResolvedValue(mockCampaign),
+        },
+        auditLog: {
+          create: jest.fn().mockResolvedValue({}),
         },
       })
       .overrideProvider(StripeService)
