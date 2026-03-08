@@ -46,8 +46,8 @@ import { secretsLoader } from '@agency/utils';
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
         redis: {
-          host: 'localhost',
-          port: 6379,
+          host: configService.get('REDIS_HOST', 'localhost'),
+          port: parseInt(configService.get('REDIS_PORT', '6379'), 10),
         },
       }),
       inject: [ConfigService],
