@@ -1,0 +1,29 @@
+Entrypoint [1mmain[39m[22m =
+
+[1m[31mERROR[39m[22m in [1m[32mmain[39m[22m
+[1mModule [1m[31mnot found[39m[22m[1m: [1m[31mError[39m[22m[1m: Can't resolve 'ts-loader' in 'C:\Antigravity\AutonomousWebSales\apps\api'[39m[22m
+resolve 'ts-loader' in 'C:\Antigravity\AutonomousWebSales\apps\api'
+  Parsed request is a module
+  using description file: C:\Antigravity\AutonomousWebSales\apps\api\package.json (relative path: .)
+    resolve as module
+      looking for modules in C:\Antigravity\AutonomousWebSales\apps\api\node_modules
+        single file module
+          using description file: C:\Antigravity\AutonomousWebSales\apps\api\package.json (relative path: ./node_modules/ts-loader)
+            no extension
+[1m[31m              C:\Antigravity\AutonomousWebSales\apps\api\node_modules\ts-loader doesn't exist[39m[22m
+            .js
+[1m[31m              C:\Antigravity\AutonomousWebSales\apps\api\node_modules\ts-loader.js doesn't exist[39m[22m
+[1m[31m        C:\Antigravity\AutonomousWebSales\apps\api\node_modules\ts-loader doesn't exist[39m[22m
+[1m[31m      C:\Antigravity\AutonomousWebSales\apps\node_modules doesn't exist[39m[22m or is not a directory
+      looking for modules in C:\Antigravity\AutonomousWebSales\node_modules
+        single file module
+          using description file: C:\Antigravity\AutonomousWebSales\package.json (relative path: ./node_modules/ts-loader)
+            no extension
+[1m[31m              C:\Antigravity\AutonomousWebSales\node_modules\ts-loader doesn't exist[39m[22m
+            .js
+[1m[31m              C:\Antigravity\AutonomousWebSales\node_modules\ts-loader.js doesn't exist[39m[22m
+[1m[31m        C:\Antigravity\AutonomousWebSales\node_modules\ts-loader doesn't exist[39m[22m
+[1m[31m      C:\Antigravity\node_modules doesn't exist[39m[22m or is not a directory
+[1m[31m      C:\node_modules doesn't exist[39m[22m or is not a directory
+
+webpack 5.97.1 compiled with [1m[31m1 error[39m[22m in 4133 ms

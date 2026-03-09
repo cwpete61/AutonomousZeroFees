@@ -27,9 +27,8 @@ enum UserRole {
 }
 
 enum UserStatus {
-  ACTIVE
-  INACTIVE
-  SUSPENDED
+  UNBLOCKED
+  BLOCKED
 }
 
 enum AdminType {
@@ -312,10 +311,11 @@ enum NotificationChannel {
 model User {
   id           String     @id @default(cuid())
   email        String     @unique
-  passwordHash String?
-  fullName     String?
+  username     String     @unique
+  passwordHash String
+  fullName     String
   role         UserRole
-  status       UserStatus @default(ACTIVE)
+  status       UserStatus @default(UNBLOCKED)
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
 

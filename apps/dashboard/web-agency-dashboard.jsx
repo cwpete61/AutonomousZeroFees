@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { campaignsApi, leadsApi, emailSequencesApi, agentsApi, settingsApi, diagnosticsApi, aiApi } from './src/lib/api';
+import { campaignsApi, leadsApi, emailSequencesApi, agentsApi, settingsApi, diagnosticsApi, aiApi, authApi, usersApi } from './src/lib/api';
+import { RBAC } from './src/lib/rbac';
 
 const PIPELINE_STAGES = [
   { id: 'lead_inbox', label: 'Lead Inbox', color: '#94a3b8' },
@@ -49,32 +50,32 @@ const INITIAL_AGENTS = [
 
 const INITIAL_CRM_CLIENTS = [
   {
-    id: 'c1', name: 'Sparkle Cleaning', contact: 'Maria Garcia', email: 'maria@sparklecleaning.com', phone: '(312) 555-8821', industry: 'Cleaning', city: 'Chicago, IL', website: 'sparklecleaning.com', score: 89, stage: 'delivered', outreachAt: '2026-02-02', repliedAt: '2026-02-04', paidAt: '2026-02-08', deliveredAt: '2026-02-15', invoiceId: 'INV-1001', amount: 2994, paymentMethod: 'Stripe', paymentStatus: 'paid', automation: { scout: true, outreach: true, analysis: true, design: true }, timeline: [
+    id: 'c1', name: 'Sparkle Cleaning', contact: 'Maria Garcia', email: 'maria@sparklecleaning.com', phone: '(312) 555-8821', industry: 'Cleaning', city: 'Chicago, IL', website: 'sparklecleaning.com', score: 89, stage: 'delivered', outreachAt: '2026-02-02', repliedAt: '2026-02-04', paidAt: '2026-02-08', deliveredAt: '2026-02-15', invoiceId: 'INV-1001', amount: 2994, paymentMethod: 'Stripe', paymentStatus: 'paid', pagespeedScore: 45, gtmetrixScore: 52, pingdomScore: 88, engagementScore: 92, emailOpenRate: 88, demoViewTime: 15, replyVelocity: 2, conversionVelocity: 8, churnRisk: 5, readinessFactor: 100, monthlyLeadProjection: 52, roiFactor: 5.8, automationSavings: 34, automation: { scout: true, outreach: true, analysis: true, design: true }, timeline: [
       { date: '2026-02-01', action: 'Discovered by Scout Agent', type: 'system' }, { date: '2026-02-01', action: 'Auto-qualified: Score 89/100', type: 'system' }, { date: '2026-02-02', action: 'Cold email sent via Resend', type: 'email' }, { date: '2026-02-03', action: 'SMS outreach sent (Twilio)', type: 'sms' }, { date: '2026-02-04', action: 'Maria replied: "Interested, show me more"', type: 'reply' }, { date: '2026-02-05', action: 'Blurred mockup sent via email', type: 'email' }, { date: '2026-02-05', action: 'Maria viewed demo (2m 34s)', type: 'engagement' }, { date: '2026-02-06', action: 'Voice follow-up call (AI script)', type: 'call' }, { date: '2026-02-06', action: 'Proposal generated: $2,994', type: 'system' }, { date: '2026-02-06', action: 'Stripe invoice sent', type: 'payment' }, { date: '2026-02-08', action: 'Payment received: $2,994', type: 'payment' }, { date: '2026-02-09', action: 'Web Build Agent started', type: 'system' }, { date: '2026-02-15', action: 'Website delivered & live', type: 'delivery' }
     ]
   },
   {
-    id: 'c2', name: 'Summit Roofing', contact: 'Jake Williams', email: 'jake@summitroofing.com', phone: '(615) 555-3390', industry: 'Roofing', city: 'Nashville, TN', website: 'summitroofing.com', score: 78, stage: 'building', outreachAt: '2026-02-11', repliedAt: '2026-02-14', paidAt: '2026-02-18', deliveredAt: null, invoiceId: 'INV-1002', amount: 3494, paymentMethod: 'Stripe', paymentStatus: 'paid', automation: { scout: true, outreach: true, analysis: true, design: true }, timeline: [
+    id: 'c2', name: 'Summit Roofing', contact: 'Jake Williams', email: 'jake@summitroofing.com', phone: '(615) 555-3390', industry: 'Roofing', city: 'Nashville, TN', website: 'summitroofing.com', score: 78, stage: 'building', outreachAt: '2026-02-11', repliedAt: '2026-02-14', paidAt: '2026-02-18', deliveredAt: null, invoiceId: 'INV-1002', amount: 3494, paymentMethod: 'Stripe', paymentStatus: 'paid', pagespeedScore: 82, gtmetrixScore: 76, pingdomScore: 99, engagementScore: 85, emailOpenRate: 75, demoViewTime: 8, replyVelocity: 5, conversionVelocity: 14, churnRisk: 12, readinessFactor: 85, monthlyLeadProjection: 38, roiFactor: 4.2, automationSavings: 18, automation: { scout: true, outreach: true, analysis: true, design: true }, timeline: [
       { date: '2026-02-10', action: 'Discovered by Scout Agent', type: 'system' }, { date: '2026-02-11', action: 'Email + LinkedIn DM sent', type: 'email' }, { date: '2026-02-14', action: 'Jake replied via LinkedIn', type: 'reply' }, { date: '2026-02-15', action: 'Demo mockup delivered', type: 'system' }, { date: '2026-02-16', action: 'Proposal sent: $3,494', type: 'system' }, { date: '2026-02-18', action: 'Payment received: $3,494', type: 'payment' }, { date: '2026-02-20', action: 'Web Build Agent started', type: 'system' }
     ]
   },
   {
-    id: 'c3', name: 'Diamond Cleaning', contact: 'Lisa Park', email: 'lisa@diamondclean.com', phone: '(206) 555-7712', industry: 'Cleaning', city: 'Seattle, WA', website: 'diamondclean.com', score: 67, stage: 'proposal_sent', outreachAt: '2026-02-19', repliedAt: '2026-02-22', paidAt: null, deliveredAt: null, invoiceId: 'INV-1003', amount: 2494, paymentMethod: null, paymentStatus: 'pending', automation: { scout: true, outreach: true, analysis: true, design: true }, timeline: [
+    id: 'c3', name: 'Diamond Cleaning', contact: 'Lisa Park', email: 'lisa@diamondclean.com', phone: '(206) 555-7712', industry: 'Cleaning', city: 'Seattle, WA', website: 'diamondclean.com', score: 67, stage: 'proposal_sent', outreachAt: '2026-02-19', repliedAt: '2026-02-22', paidAt: null, deliveredAt: null, invoiceId: 'INV-1003', amount: 2494, paymentMethod: null, paymentStatus: 'pending', engagementScore: 65, emailOpenRate: 60, demoViewTime: 5, replyVelocity: 3, conversionVelocity: 18, churnRisk: 25, readinessFactor: 45, monthlyLeadProjection: 28, roiFactor: 3.5, automationSavings: 12, automation: { scout: true, outreach: true, analysis: true, design: true }, timeline: [
       { date: '2026-02-18', action: 'Discovered by Scout Agent', type: 'system' }, { date: '2026-02-19', action: 'Cold email sent', type: 'email' }, { date: '2026-02-22', action: 'Lisa replied: "What does this cost?"', type: 'reply' }, { date: '2026-02-23', action: 'Mockup + pricing sent', type: 'email' }, { date: '2026-02-25', action: 'Proposal sent: $2,494', type: 'system' }, { date: '2026-02-25', action: 'Stripe invoice sent — awaiting payment', type: 'payment' }
     ]
   },
   {
-    id: 'c4', name: 'Green Landscaping', contact: 'Tom Chen', email: 'tom@greenlandscaping.com', phone: '(503) 555-4488', industry: 'Landscaping', city: 'Portland, OR', website: 'greenlandscaping.com', score: 52, stage: 'replied', outreachAt: '2026-02-26', repliedAt: '2026-03-01', paidAt: null, deliveredAt: null, invoiceId: null, amount: null, paymentMethod: null, paymentStatus: null, automation: { scout: true, outreach: true, analysis: true, design: true }, timeline: [
+    id: 'c4', name: 'Green Landscaping', contact: 'Tom Chen', email: 'tom@greenlandscaping.com', phone: '(503) 555-4488', industry: 'Landscaping', city: 'Portland, OR', website: 'greenlandscaping.com', score: 52, stage: 'replied', outreachAt: '2026-02-26', repliedAt: '2026-03-01', paidAt: null, deliveredAt: null, invoiceId: null, amount: null, paymentMethod: null, paymentStatus: null, engagementScore: 45, emailOpenRate: 40, demoViewTime: 2, replyVelocity: 4, conversionVelocity: 25, churnRisk: 40, readinessFactor: 20, monthlyLeadProjection: 15, roiFactor: 1.8, automationSavings: 5, automation: { scout: true, outreach: true, analysis: true, design: true }, timeline: [
       { date: '2026-02-25', action: 'Discovered by Scout Agent', type: 'system' }, { date: '2026-02-26', action: 'Email + Facebook DM sent', type: 'email' }, { date: '2026-03-01', action: 'Tom replied: "Send me info"', type: 'reply' }
     ]
   },
   {
-    id: 'c5', name: 'Best Roofing LLC', contact: 'Dan Miller', email: 'dan@bestroofingco.com', phone: '(720) 555-1199', industry: 'Roofing', city: 'Denver, CO', website: 'bestroofingco.com', score: 38, stage: 'outreach_sent', outreachAt: '2026-03-02', repliedAt: null, paidAt: null, deliveredAt: null, invoiceId: null, amount: null, paymentMethod: null, paymentStatus: null, automation: { scout: true, outreach: true, analysis: true, design: true }, timeline: [
+    id: 'c5', name: 'Best Roofing LLC', contact: 'Dan Miller', email: 'dan@bestroofingco.com', phone: '(720) 555-1199', industry: 'Roofing', city: 'Denver, CO', website: 'bestroofingco.com', score: 38, stage: 'outreach_sent', outreachAt: '2026-03-02', repliedAt: null, paidAt: null, deliveredAt: null, invoiceId: null, amount: null, paymentMethod: null, paymentStatus: null, engagementScore: 20, emailOpenRate: 15, demoViewTime: 0, replyVelocity: 0, conversionVelocity: 30, churnRisk: 70, readinessFactor: 5, monthlyLeadProjection: 10, roiFactor: 1.2, automationSavings: 2, automation: { scout: true, outreach: true, analysis: true, design: true }, timeline: [
       { date: '2026-03-01', action: 'Discovered by Scout Agent', type: 'system' }, { date: '2026-03-02', action: 'Cold email sent', type: 'email' }, { date: '2026-03-04', action: 'Follow-up #1 sent', type: 'email' }
     ]
   },
   {
-    id: 'c6', name: 'Apex Electric', contact: 'Rosa Diaz', email: 'rosa@apexelectric.net', phone: '(305) 555-6644', industry: 'Electrical', city: 'Miami, FL', website: 'apexelectric.net', score: 41, stage: 'outreach_sent', outreachAt: '2026-03-03', repliedAt: null, paidAt: null, deliveredAt: null, invoiceId: null, amount: null, paymentMethod: null, paymentStatus: null, automation: { scout: true, outreach: true, analysis: true, design: true }, timeline: [
+    id: 'c6', name: 'Apex Electric', contact: 'Rosa Diaz', email: 'rosa@apexelectric.net', phone: '(305) 555-6644', industry: 'Electrical', city: 'Miami, FL', website: 'apexelectric.net', score: 41, stage: 'outreach_sent', outreachAt: '2026-03-03', repliedAt: null, paidAt: null, deliveredAt: null, invoiceId: null, amount: null, paymentMethod: null, paymentStatus: null, engagementScore: 18, emailOpenRate: 12, demoViewTime: 0, replyVelocity: 0, conversionVelocity: 32, churnRisk: 75, readinessFactor: 2, monthlyLeadProjection: 8, roiFactor: 1.1, automationSavings: 1, automation: { scout: true, outreach: true, analysis: true, design: true }, timeline: [
       { date: '2026-03-02', action: 'Discovered by Scout Agent', type: 'system' }, { date: '2026-03-03', action: 'Email + Instagram DM sent', type: 'email' }
     ]
   },
@@ -284,6 +285,8 @@ const API_COST_MODELS = {
   },
 };
 
+// INITIAL_USERS removed in favor of backend API
+
 function getScoreClass(score) {
   if (score >= 70) return { bg: 'rgba(34,197,94,0.15)', color: '#22c55e' };
   if (score >= 50) return { bg: 'rgba(245,158,11,0.15)', color: '#f59e0b' };
@@ -300,9 +303,254 @@ function getStatusStyle(status) {
   return map[status] || map.idle;
 }
 
+const LoginView = ({ onLogin }) => {
+  const [identifier, setIdentifier] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [isForgotPassword, setIsForgotPassword] = useState(false);
+  const [error, setError] = useState('');
+  const [message, setMessage] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setMessage('');
+    setIsSubmitting(true);
+
+    try {
+      if (isForgotPassword) {
+        const res = await authApi.forgotCredentials(identifier);
+        setMessage(res.message || 'Recovery details sent if account exists.');
+      } else {
+        const res = await authApi.login({ identifier, password });
+        if (res.access_token) {
+          localStorage.setItem('orbis_token', res.access_token);
+          onLogin(res.user);
+        } else {
+          setError('Login failed. Please try again.');
+        }
+      }
+    } catch (err) {
+      setError(err.message || 'An error occurred. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <div style={{
+      minHeight: '100vh',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      background: 'radial-gradient(circle at top right, #1e1b4b, #020617)',
+      fontFamily: 'Inter, system-ui, sans-serif',
+      color: '#f8fafc',
+      padding: '20px'
+    }}>
+      <div style={{
+        width: '100%',
+        maxWidth: '420px',
+        background: 'rgba(15, 23, 42, 0.6)',
+        backdropFilter: 'blur(16px)',
+        border: '1px solid rgba(255, 255, 255, 0.1)',
+        borderRadius: '24px',
+        padding: '40px',
+        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)'
+      }}>
+        <div style={{ textAlign: 'center', marginBottom: '40px' }}>
+          <div style={{
+            width: '64px',
+            height: '64px',
+            background: 'linear-gradient(135deg, #6366f1, #a855f7)',
+            borderRadius: '16px',
+            margin: '0 auto 20px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            boxShadow: '0 10px 15px -3px rgba(99, 102, 241, 0.4)'
+          }}>
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+          </div>
+          <h1 style={{ fontSize: '28px', fontWeight: '700', marginBottom: '8px', background: 'linear-gradient(to right, #fff, #94a3b8)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+            {isForgotPassword ? 'Recover Access' : 'Admin Portal'}
+          </h1>
+          <p style={{ color: '#94a3b8', fontSize: '14px' }}>
+            {isForgotPassword ? 'Enter your details to receive recovery info.' : 'Secure entry for Autonomous Web Agency.'}
+          </p>
+        </div>
+
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <div>
+            <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', color: '#cbd5e1' }}>Email or Username</label>
+            <input
+              type="text"
+              required
+              value={identifier}
+              onChange={(e) => setIdentifier(e.target.value)}
+              placeholder="admin@agency.com"
+              style={{
+                width: '100%',
+                padding: '12px 16px',
+                background: 'rgba(30, 41, 59, 0.5)',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                borderRadius: '12px',
+                color: '#fff',
+                fontSize: '15px',
+                transition: 'all 0.2s',
+                outline: 'none'
+              }}
+              onFocus={(e) => e.target.style.borderColor = '#6366f1'}
+              onBlur={(e) => e.target.style.borderColor = 'rgba(255, 255, 255, 0.1)'}
+            />
+          </div>
+
+          {!isForgotPassword && (
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                <label style={{ fontSize: '14px', color: '#cbd5e1' }}>Password</label>
+                <button
+                  type="button"
+                  onClick={() => setIsForgotPassword(true)}
+                  style={{ fontSize: '12px', color: '#6366f1', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+                >
+                  Forgot Email or Username?
+                </button>
+              </div>
+              <div style={{ position: 'relative' }}>
+                <input
+                  type={showPassword ? "text" : "password"}
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  style={{
+                    width: '100%',
+                    padding: '12px 48px 12px 16px',
+                    background: 'rgba(30, 41, 59, 0.5)',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    borderRadius: '12px',
+                    color: '#fff',
+                    fontSize: '15px',
+                    transition: 'all 0.2s',
+                    outline: 'none'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#6366f1'}
+                  onBlur={(e) => e.target.style.borderColor = 'rgba(255, 255, 255, 0.1)'}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  style={{
+                    position: 'absolute',
+                    right: '12px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    color: '#94a3b8',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: '4px',
+                    zIndex: 2
+                  }}
+                >
+                  {showPassword ? (
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                      <line x1="1" y1="1" x2="23" y2="23"></line>
+                    </svg>
+                  ) : (
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                      <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                  )}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {error && <div style={{ color: '#f87171', fontSize: '13px', background: 'rgba(248, 113, 113, 0.1)', padding: '10px', borderRadius: '8px', border: '1px solid rgba(248, 113, 113, 0.2)' }}>{error}</div>}
+          {message && <div style={{ color: '#4ade80', fontSize: '13px', background: 'rgba(74, 222, 128, 0.1)', padding: '10px', borderRadius: '8px', border: '1px solid rgba(74, 222, 128, 0.2)' }}>{message}</div>}
+
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            style={{
+              padding: '14px',
+              background: 'linear-gradient(135deg, #6366f1, #a855f7)',
+              color: 'white',
+              border: 'none',
+              borderRadius: '12px',
+              fontSize: '16px',
+              fontWeight: '600',
+              cursor: isSubmitting ? 'not-allowed' : 'pointer',
+              opacity: isSubmitting ? 0.7 : 1,
+              transition: 'transform 0.2s, box-shadow 0.2s',
+              marginTop: '10px'
+            }}
+            onMouseOver={(e) => !isSubmitting && (e.target.style.transform = 'translateY(-1px)')}
+            onMouseOut={(e) => !isSubmitting && (e.target.style.transform = 'translateY(0)')}
+          >
+            {isSubmitting ? 'Processing...' : (isForgotPassword ? 'Send Recovery Info' : 'Sign In')}
+          </button>
+
+          {isForgotPassword && (
+            <button
+              type="button"
+              onClick={() => setIsForgotPassword(false)}
+              style={{ background: 'none', border: 'none', color: '#94a3b8', fontSize: '14px', cursor: 'pointer', marginTop: '10px' }}
+            >
+              Back to Sign In
+            </button>
+          )}
+        </form>
+      </div>
+    </div>
+  );
+};
+
 export default function Dashboard() {
   const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:40000';
   const [activeView, setActiveView] = useState('pipeline');
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const token = localStorage.getItem('orbis_token');
+      if (token) {
+        try {
+          const profile = await authApi.getProfile();
+          if (profile) {
+            setUser(profile);
+            setIsAuthenticated(true);
+          } else {
+            localStorage.removeItem('orbis_token');
+          }
+        } catch (error) {
+          console.error('Session check failed:', error);
+          localStorage.removeItem('orbis_token');
+        }
+      }
+      setLoading(false);
+    };
+    checkAuth();
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('orbis_token');
+    setIsAuthenticated(false);
+    setUser(null);
+  };
   const [isDark, setIsDark] = useState(true);
   const [phaseSettings, setPhaseSettings] = useState({
     lead_inbox: true, discovered: true, qualified: true, outreach_sent: true, replied: true,
@@ -344,6 +592,7 @@ export default function Dashboard() {
   const [isSystemAccordionOpen, setIsSystemAccordionOpen] = useState(false);
   const [isLocationsAccordionOpen, setIsLocationsAccordionOpen] = useState(false);
   const [isWorkflowTestAccordionOpen, setIsWorkflowTestAccordionOpen] = useState(false);
+  const [isGscAccordionOpen, setIsGscAccordionOpen] = useState(false);
   const [workflowTestUrl, setWorkflowTestUrl] = useState('');
   const [isWorkflowTesting, setIsWorkflowTesting] = useState(false);
   const [pipelineFitMode, setPipelineFitMode] = useState(false);
@@ -356,6 +605,21 @@ export default function Dashboard() {
     runware: 'runware:400@3'
   });
   const [masterConnect, setMasterConnect] = useState(true);
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    if (user) {
+      usersApi.list().then(setUsers).catch(console.error);
+    }
+  }, [user]);
+  const [isUserModalOpen, setIsUserModalOpen] = useState(false);
+  const [editingUser, setEditingUser] = useState(null);
+  const [newUser, setNewUser] = useState({ name: '', email: '', username: '', role: 'standard_user', status: 'UNBLOCKED' });
+  
+  // RBAC Setup
+  const currentUser = user || { role: 'super_admin' };
+  const permissions = RBAC.roles[currentUser.role]?.permissions || {};
+  const ui_restrictions = RBAC.roles[currentUser.role]?.ui_restrictions || {};
 
   // ─── Email Sequences State ────────────────────────────────────────
   const blankEmailStep = (step) => ({ step, subject: '', body: '', delayDays: step === 1 ? 0 : 3 });
@@ -395,7 +659,7 @@ export default function Dashboard() {
             if (Array.isArray(lData)) setCrmData(lData);
             if (Array.isArray(sData)) setEmailSequences(sData);
         } catch (err) {
-            console.error("API Fetch Error:", err);
+            if (!err.isOffline) console.error("API Fetch Error:", err);
         }
     }
 
@@ -599,6 +863,24 @@ export default function Dashboard() {
       localStorage.setItem('orbis_master_sync', next ? 'true' : 'false');
       return next;
     });
+  };
+
+  const handleSaveUser = () => {
+    if (!newUser.name || !newUser.email || !newUser.username) return;
+    if (editingUser) {
+      // Username is immutable, so we ignore any changes to it in the payload to match backend logic
+      const { username, isOnline, ...updateData } = newUser;
+      usersApi.update(editingUser.id, updateData).then(() => {
+        usersApi.list().then(setUsers);
+      });
+    } else {
+      usersApi.create(newUser).then(() => {
+        usersApi.list().then(setUsers);
+      });
+    }
+    setIsUserModalOpen(false);
+    setNewUser({ name: '', email: '', username: '', role: 'standard_user', status: 'UNBLOCKED' });
+    setEditingUser(null);
   };
 
   const handleToggleApi = (id) => {
@@ -1040,6 +1322,13 @@ export default function Dashboard() {
   const llmCount = 3; // OpenAI, Claude, Runware
   const serviceProviderCount = totalApisCount - llmCount;
 
+  // ─── User Stats ──────────────────────────────────────────────────
+  const totalUsersCount = users.length;
+  const adminCount = users.filter(u => u.role === 'Admins').length;
+  const supervisorCount = users.filter(u => u.role === 'Supervisors').length;
+  const standardUserCount = users.filter(u => u.role === 'Users').length;
+  const onlineCount = users.filter(u => u.status === 'Online').length;
+
   const leadsPerStage = (PIPELINE_STAGES || []).map(stage => ({
     ...stage,
     leads: (safeCrmData || []).filter(l => l.stage === stage.id),
@@ -1235,6 +1524,19 @@ export default function Dashboard() {
     );
   };
 
+  if (loading) {
+    return (
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#020617', color: '#6366f1' }}>
+        <div className="premium-spinner" style={{ width: '40px', height: '40px', border: '4px solid rgba(99, 102, 241, 0.1)', borderTop: '4px solid #6366f1', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
+        <style dangerouslySetInnerHTML={{ __html: `@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }` }} />
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return <LoginView onLogin={(userData) => { setUser(userData); setIsAuthenticated(true); }} />;
+  }
+
   return (
     <div style={{ minHeight: '100vh', background: t.bg, color: t.text, fontFamily: "'Inter', system-ui, sans-serif", transition: 'background 0.3s, color 0.3s' }}>
       <header style={{ padding: 'clamp(14px, 1.5vw, 22px) clamp(20px, 2.5vw, 36px)', borderBottom: `1px solid ${t.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: t.headerBg, backdropFilter: 'blur(12px)', position: 'sticky', top: 0, zIndex: 100 }}>
@@ -1242,10 +1544,25 @@ export default function Dashboard() {
           <div style={{ width: 'clamp(32px, 3vw, 42px)', height: 'clamp(32px, 3vw, 42px)', background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 'clamp(0.9rem, 1.2vw, 1.2rem)' }}>◉</div>
           <span style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 'clamp(1.1rem, 1.5vw, 1.5rem)' }}>Orbis Outreach</span>
         </div>
-        <div style={{ display: 'flex', gap: 'clamp(4px, 0.6vw, 10px)', alignItems: 'center', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: 'clamp(2px, 0.4vw, 8px)', alignItems: 'center', flexWrap: 'wrap' }}>
           {['campaigns', 'emailcampaigns', 'jobqueue', 'agents', 'pipeline', 'crm', 'analytics', 'api', 'users', 'system'].map(view => (
-            <button key={view} onClick={() => handleViewChange(view)} style={{ padding: 'clamp(6px, 0.7vw, 10px) clamp(10px, 1.2vw, 20px)', borderRadius: '8px', border: 'none', cursor: 'pointer', fontSize: 'clamp(0.72rem, 0.85vw, 1.05rem)', fontWeight: 600, letterSpacing: '0.03em', background: activeView === view ? 'rgba(99,102,241,0.2)' : 'transparent', color: activeView === view ? '#818cf8' : t.textMuted, transition: 'all 0.15s' }}>
-              {view.toUpperCase()}
+            <button 
+              key={view} 
+              onClick={() => handleViewChange(view)} 
+              style={{ 
+                padding: 'clamp(4px, 0.5vw, 8px) clamp(8px, 1vw, 16px)', 
+                borderRadius: '8px', 
+                border: 'none', 
+                cursor: 'pointer', 
+                fontSize: 'clamp(0.58rem, 0.68vw, 0.84rem)', 
+                fontWeight: 600, 
+                letterSpacing: '0.05em', 
+                background: activeView === view ? 'rgba(99,102,241,0.2)' : 'transparent', 
+                color: activeView === view ? '#818cf8' : t.textMuted, 
+                transition: 'all 0.15s' 
+              }}
+            >
+              {view === 'emailcampaigns' ? 'EMAIL CAMPAIGNS' : (view === 'jobqueue' ? 'JOB QUEUE' : view.toUpperCase())}
             </button>
           ))}
           <button 
@@ -1266,6 +1583,32 @@ export default function Dashboard() {
           >
             {masterConnect ? '🔗' : '🔌'}
           </button>
+          <div style={{ width: '1px', height: '24px', background: t.borderSubtle, margin: '0 8px' }} />
+          
+          <button 
+            onClick={handleLogout}
+            style={{ 
+              padding: 'clamp(6px, 0.7vw, 10px) clamp(10px, 1.2vw, 20px)', 
+              borderRadius: '8px', 
+              border: 'none', 
+              background: 'rgba(244, 63, 94, 0.1)', 
+              color: '#f43f5e', 
+              fontSize: 'clamp(0.72rem, 0.85vw, 1.05rem)', 
+              fontWeight: 700, 
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              transition: 'all 0.2s'
+            }}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+              <polyline points="16 17 21 12 16 7"></polyline>
+              <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+            LOGOUT
+          </button>
           <button onClick={toggleTheme} style={{ padding: 'clamp(6px, 0.7vw, 10px)', borderRadius: '8px', border: 'none', background: 'transparent', cursor: 'pointer', fontSize: 'clamp(1rem, 1.2vw, 1.4rem)' }}>{isDark ? '☀️' : '🌙'}</button>
         </div>
       </header>
@@ -1279,6 +1622,11 @@ export default function Dashboard() {
                 { label: 'Active APIs', value: activeApisCount, color: '#22c55e', pct: totalApisCount > 0 ? (activeApisCount / totalApisCount) * 100 : 0 },
                 { label: 'Total LLMs', value: llmCount, color: '#f59e0b', pct: 100 },
                 { label: 'Service Providers', value: serviceProviderCount, color: '#14b8a6', pct: 100 },
+              ] : activeView === 'users' ? [
+                { label: 'Total Users', value: totalUsersCount, color: '#6366f1', pct: 100 },
+                { label: 'Admins / Supervisors', value: `${users.filter(u => u.role === 'admin' || u.role === 'super_admin').length} / ${users.filter(u => u.role === 'supervisor').length}`, color: '#22c55e', pct: totalUsersCount > 0 ? ((users.filter(u => u.role === 'admin' || u.role === 'super_admin').length + users.filter(u => u.role === 'supervisor').length) / totalUsersCount) * 100 : 0 },
+                { label: 'Standard Users', value: users.filter(u => u.role === 'standard_user').length, color: '#f59e0b', pct: totalUsersCount > 0 ? (users.filter(u => u.role === 'standard_user').length / totalUsersCount) * 100 : 0 },
+                { label: 'Online Now', value: onlineCount, color: '#14b8a6', pct: totalUsersCount > 0 ? (onlineCount / totalUsersCount) * 100 : 0 },
               ] : [
                 { label: 'Total Leads', value: safeCrmData.length, color: '#6366f1', pct: safeCrmData.length > 0 ? Math.min((safeCrmData.length / 100) * 100, 100) : 0 },
                 { label: 'Campaigns', value: safeCampaigns.length, color: '#22c55e', pct: safeCampaigns.length > 0 ? Math.min((safeCampaigns.length / 10) * 100, 100) : 0 },
@@ -1889,114 +2237,168 @@ export default function Dashboard() {
             )}
 
             {activeView === 'analytics' && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                   <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
-                      <h2 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 800 }}>Listings</h2>
-                      <span style={{ padding: '4px 10px', borderRadius: '20px', background: 'rgba(34, 197, 94, 0.15)', color: '#22c55e', fontSize: '0.8rem', fontWeight: 800 }}>72%</span>
-                    </div>
-                    <p style={{ margin: 0, fontSize: '0.85rem', color: t.textSecondary, maxWidth: '800px', lineHeight: '1.6' }}>
-                      Hmm, Looks like you are listed incorrectly in few of the websites. Customers are more likely to trust a business with a complete, accurate, and up-to-date business information. A few incorrect listings may hurt your business in the long-run.
+                    <h2 style={{ margin: 0, fontSize: '1.8rem', fontWeight: 800, background: 'linear-gradient(135deg, #6366f1, #a855f7)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>System Performance Dashboard</h2>
+                    <p style={{ margin: '8px 0 0 0', fontSize: '0.9rem', color: t.textSecondary, maxWidth: '800px' }}>
+                      Real-time monitoring of the Autonomous Web Sales Engine. Tracking financial health, agent efficiency, and infrastructure stability.
                     </p>
+                  </div>
+                  <div style={{ padding: '8px 16px', background: 'rgba(34, 197, 94, 0.1)', border: `1px solid rgba(34, 197, 94, 0.2)`, borderRadius: '12px', fontSize: '0.85rem', color: '#22c55e', fontWeight: 700 }}>
+                    System Status: Normal
                   </div>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '24px' }}>
-                  {/* Card 1: Listings Accuracy */}
-                  <div style={{ padding: '32px', background: t.card, border: `1px solid ${t.border}`, borderRadius: '20px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                    <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700 }}>Listings</h3>
-                    
-                    <div style={{ display: 'flex', gap: '24px', alignItems: 'center', marginTop: '16px', flexWrap: 'wrap' }}>
-                      {/* Circular Progress */}
-                      <div style={{ position: 'relative', width: '120px', height: '120px', display: 'flex', justifyContent: 'center', alignItems: 'center', borderRadius: '50%', background: `conic-gradient(#22c55e 72%, ${isDark ? 'rgba(255,255,255,0.05)' : '#f1f5f9'} 0)` }}>
-                        <div style={{ position: 'absolute', width: '96px', height: '96px', background: t.card, borderRadius: '50%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                          <span style={{ fontSize: '1.8rem', fontWeight: 800 }}>72%</span>
-                        </div>
-                      </div>
-
-                      {/* Bars */}
-                      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '20px', minWidth: '150px' }}>
-                        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '-10px' }}>
-                          <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#22c55e', background: 'rgba(34,197,94,0.1)', padding: '2px 8px', borderRadius: '12px' }}>● 72% Accurate</span>
-                        </div>
-                        
-                        {[ { label: 'Business Name', val: 73 }, { label: 'Address', val: 70 }, { label: 'Phone', val: 73 } ].map(item => (
-                          <div key={item.label} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', fontWeight: 600 }}>
-                              <span>{item.label}</span>
-                              <span>{item.val}%</span>
-                            </div>
-                            <div style={{ width: '100%', height: '8px', background: isDark ? 'rgba(255,255,255,0.05)' : '#f1f5f9', borderRadius: '4px', overflow: 'hidden' }}>
-                              <div style={{ width: `${item.val}%`, height: '100%', background: '#22c55e', borderRadius: '4px' }} />
-                            </div>
-                          </div>
-                        ))}
-                      </div>
+                {/* Full-width GSC Card */}
+                <div style={{ padding: '32px', background: t.card, border: `1px solid ${t.border}`, borderRadius: '24px', display: 'flex', flexDirection: 'column', gap: '24px', boxShadow: '0 8px 32px rgba(0,0,0,0.12)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <span style={{ fontSize: '1.5rem' }}>🔍</span>
+                      <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700 }}>Google Search Console</h3>
+                    </div>
+                    <div style={{ padding: '6px 14px', background: 'rgba(99, 102, 241, 0.1)', border: '1px solid rgba(99, 102, 241, 0.2)', borderRadius: '12px', fontSize: '0.8rem', color: '#6366f1', fontWeight: 700 }}>
+                      Connected
                     </div>
                   </div>
 
-                  {/* Card 2: Online Health Score */}
-                  <div style={{ padding: '32px', background: t.card, border: `1px solid ${t.border}`, borderRadius: '20px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                    <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700 }}>Online Health Score</h3>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '24px' }}>
+                    <div style={{ padding: '24px', background: t.bg, borderRadius: '16px', border: `1px solid ${t.borderSubtle}` }}>
+                      <div style={{ fontSize: '0.75rem', color: t.textMuted, fontWeight: 700, textTransform: 'uppercase', marginBottom: '8px' }}>Total Clicks</div>
+                      <div style={{ fontSize: '2rem', fontWeight: 800, color: '#6366f1' }}>12.4K</div>
+                      <div style={{ fontSize: '0.8rem', color: '#22c55e', fontWeight: 600, marginTop: '8px' }}>↑ 14% vs last month</div>
+                    </div>
                     
-                    <div style={{ display: 'flex', gap: '24px', alignItems: 'center', marginTop: '16px', flexWrap: 'wrap' }}>
-                      {/* Donut Chart */}
-                      <div style={{ position: 'relative', width: '140px', height: '140px', display: 'flex', justifyContent: 'center', alignItems: 'center', borderRadius: '50%', background: 'conic-gradient(#22c55e 0% 67%, #3b82f6 67% 76%, #ef4444 76% 100%)' }}>
-                        <div style={{ position: 'absolute', width: '96px', height: '96px', background: t.card, borderRadius: '50%' }} />
-                      </div>
-
-                      {/* Legend */}
-                      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '20px', minWidth: '150px' }}>
-                        {[ 
-                          { label: 'Match', val: '22 / 33', pct: '67%', color: '#22c55e' },
-                          { label: 'Partial Match', val: '3 / 33', pct: '9%', color: '#3b82f6' },
-                          { label: 'No Match', val: '8 / 33', pct: '24%', color: '#ef4444' }
-                        ].map(item => (
-                          <div key={item.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <div>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem', fontWeight: 600 }}>
-                                <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: item.color }} />
-                                {item.label}
-                              </div>
-                              <div style={{ fontSize: '1.2rem', fontWeight: 800, marginTop: '4px', paddingLeft: '16px' }}>{item.val}</div>
-                            </div>
-                            <span style={{ fontSize: '0.8rem', fontWeight: 700, color: item.color, background: `${item.color}15`, padding: '4px 8px', borderRadius: '8px' }}>{item.pct}</span>
-                          </div>
-                        ))}
-                      </div>
+                    <div style={{ padding: '24px', background: t.bg, borderRadius: '16px', border: `1px solid ${t.borderSubtle}` }}>
+                      <div style={{ fontSize: '0.75rem', color: t.textMuted, fontWeight: 700, textTransform: 'uppercase', marginBottom: '8px' }}>Total Impressions</div>
+                      <div style={{ fontSize: '2rem', fontWeight: 800, color: '#a855f7' }}>245K</div>
+                      <div style={{ fontSize: '0.8rem', color: '#22c55e', fontWeight: 600, marginTop: '8px' }}>↑ 8% vs last month</div>
+                    </div>
+                    
+                    <div style={{ padding: '24px', background: t.bg, borderRadius: '16px', border: `1px solid ${t.borderSubtle}` }}>
+                      <div style={{ fontSize: '0.75rem', color: t.textMuted, fontWeight: 700, textTransform: 'uppercase', marginBottom: '8px' }}>Avg. CTR</div>
+                      <div style={{ fontSize: '2rem', fontWeight: 800, color: '#22c55e' }}>5.1%</div>
+                      <div style={{ fontSize: '0.8rem', color: t.textMuted, fontWeight: 600, marginTop: '8px' }}>Stable</div>
+                    </div>
+                    
+                    <div style={{ padding: '24px', background: t.bg, borderRadius: '16px', border: `1px solid ${t.borderSubtle}` }}>
+                      <div style={{ fontSize: '0.75rem', color: t.textMuted, fontWeight: 700, textTransform: 'uppercase', marginBottom: '8px' }}>Average Position</div>
+                      <div style={{ fontSize: '2rem', fontWeight: 800, color: '#f59e0b' }}>14.2</div>
+                      <div style={{ fontSize: '0.8rem', color: '#22c55e', fontWeight: 600, marginTop: '8px' }}>↑ 1.5 spots</div>
                     </div>
                   </div>
+                </div>
 
-                  {/* Card 3: Performance Audit (GTMetrix & Pingdom) */}
-                  <div style={{ padding: '32px', background: t.card, border: `1px solid ${t.border}`, borderRadius: '20px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px' }}>
+                  {/* Card 1: Financial Performance */}
+                  <div style={{ padding: '32px', background: t.card, border: `1px solid ${t.border}`, borderRadius: '24px', display: 'flex', flexDirection: 'column', gap: '24px', boxShadow: '0 8px 32px rgba(0,0,0,0.12)' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700 }}>Performance Audit</h3>
-                      <span style={{ fontSize: '1.3rem' }}>⚡</span>
+                      <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700 }}>Financial Performance</h3>
+                      <span style={{ fontSize: '1.5rem' }}>💰</span>
                     </div>
-                    
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                      {[
-                        { label: 'PageSpeed Insights', val: 42, color: '#ef4444', desc: 'Critical: LCP > 2.5s' },
-                        { label: 'GTMetrix Grade', val: 56, color: '#f59e0b', desc: 'Grade: D (Poor)' },
-                        { label: 'Pingdom Uptime', val: 98, color: '#22c55e', desc: 'Avg Response: 840ms' }
-                      ].map(item => (
-                        <div key={item.label}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', fontWeight: 600, marginBottom: '6px' }}>
-                            <span>{item.label}</span>
-                            <span style={{ color: item.color }}>{item.val}%</span>
-                          </div>
-                          <div style={{ width: '100%', height: '6px', background: isDark ? 'rgba(255,255,255,0.05)' : '#f1f5f9', borderRadius: '3px', overflow: 'hidden', marginBottom: '4px' }}>
-                            <div style={{ width: `${item.val}%`, height: '100%', background: item.color, borderRadius: '3px' }} />
-                          </div>
-                          <div style={{ fontSize: '0.7rem', color: t.textMuted }}>{item.desc}</div>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                      <div>
+                        <div style={{ fontSize: '0.75rem', color: t.textMuted, fontWeight: 700, textTransform: 'uppercase', marginBottom: '4px' }}>Total Revenue (MTD)</div>
+                        <div style={{ fontSize: '1.8rem', fontWeight: 800, color: '#22c55e' }}>
+                          ${safeCrmData.filter(l => l.paymentStatus === 'paid').reduce((acc, curr) => acc + (curr.amount || 0), 0).toLocaleString()}
                         </div>
-                      ))}
+                      </div>
+                      
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                        <div>
+                          <div style={{ fontSize: '0.7rem', color: t.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Projected MRR</div>
+                          <div style={{ fontSize: '1.1rem', fontWeight: 700 }}>$12,450</div>
+                        </div>
+                        <div>
+                          <div style={{ fontSize: '0.7rem', color: t.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>API Cost/Lead</div>
+                          <div style={{ fontSize: '1.1rem', fontWeight: 700 }}>$0.42</div>
+                        </div>
+                      </div>
+                      
+                      <div style={{ marginTop: '8px' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', fontWeight: 600, marginBottom: '8px' }}>
+                          <span>Cost vs Revenue Efficiency</span>
+                          <span style={{ color: '#6366f1' }}>94%</span>
+                        </div>
+                        <div style={{ width: '100%', height: '6px', background: t.borderSubtle, borderRadius: '3px', overflow: 'hidden' }}>
+                          <div style={{ width: '94%', height: '100%', background: 'linear-gradient(90deg, #6366f1, #a855f7)', borderRadius: '3px' }} />
+                        </div>
+                      </div>
                     </div>
                   </div>
 
-                  {/* Card 4: Google Search Console */}
+                  {/* Card 2: Agent Efficiency */}
+                  <div style={{ padding: '32px', background: t.card, border: `1px solid ${t.border}`, borderRadius: '24px', display: 'flex', flexDirection: 'column', gap: '24px', boxShadow: '0 8px 32px rgba(0,0,0,0.12)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700 }}>Agent Efficiency</h3>
+                      <span style={{ fontSize: '1.5rem' }}>🤖</span>
+                    </div>
 
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                      <div style={{ display: 'flex', gap: '24px' }}>
+                        <div style={{ position: 'relative', width: '80px', height: '80px', display: 'flex', justifyContent: 'center', alignItems: 'center', borderRadius: '50%', background: `conic-gradient(#6366f1 82%, ${t.borderSubtle} 0)` }}>
+                          <div style={{ position: 'absolute', width: '64px', height: '64px', background: t.card, borderRadius: '50%', display: 'flex', justifyContent: 'center', alignItems: 'center', fontSize: '1.1rem', fontWeight: 800 }}>82%</div>
+                        </div>
+                        <div style={{ flex: 1 }}>
+                          <div style={{ fontSize: '0.75rem', color: t.textMuted, fontWeight: 700, textTransform: 'uppercase', marginBottom: '4px' }}>Conversion Rate</div>
+                          <div style={{ fontSize: '1.4rem', fontWeight: 700 }}>Optimal</div>
+                          <div style={{ fontSize: '0.75rem', color: '#22c55e', fontWeight: 600 }}>+12% vs last month</div>
+                        </div>
+                      </div>
+
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                         {[
+                          { label: 'Scout Volume', val: 1240, color: '#6366f1', unit: 'leads' },
+                          { label: 'Outreach Velocity', val: 85, color: '#a855f7', unit: 'emails/hr' },
+                          { label: 'Avg Time to Close', val: 12, color: '#f59e0b', unit: 'days' }
+                        ].map(item => (
+                          <div key={item.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.85rem' }}>
+                            <span style={{ color: t.textSecondary }}>{item.label}</span>
+                            <span style={{ fontWeight: 700 }}>{item.val.toLocaleString()} <span style={{ fontSize: '0.7rem', color: t.textMuted, fontWeight: 500 }}>{item.unit}</span></span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Card 3: Infrastructure Health */}
+                  <div style={{ padding: '32px', background: t.card, border: `1px solid ${t.border}`, borderRadius: '24px', display: 'flex', flexDirection: 'column', gap: '24px', boxShadow: '0 8px 32px rgba(0,0,0,0.12)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700 }}>Infrastructure</h3>
+                      <span style={{ fontSize: '1.5rem' }}>⚡</span>
+                    </div>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                      <div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', fontWeight: 700, color: t.textMuted, textTransform: 'uppercase', marginBottom: '8px' }}>
+                          <span>Global API Connectivity</span>
+                          <span style={{ color: '#22c55e' }}>{activeApisCount} / {totalApisCount} Active</span>
+                        </div>
+                        <div style={{ display: 'flex', gap: '4px' }}>
+                          {Object.keys(API_COST_MODELS || {}).map(id => (
+                            <div key={id} style={{ flex: 1, height: '6px', background: apiKeys[id] ? '#22c55e' : t.borderSubtle, borderRadius: '3px' }} title={id} />
+                          ))}
+                        </div>
+                      </div>
+
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginTop: '4px' }}>
+                        <div style={{ padding: '12px', background: t.bg, borderRadius: '12px', border: `1px solid ${t.borderSubtle}` }}>
+                          <div style={{ fontSize: '0.65rem', color: t.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Avg Latency</div>
+                          <div style={{ fontSize: '1rem', fontWeight: 700 }}>240ms</div>
+                        </div>
+                        <div style={{ padding: '12px', background: t.bg, borderRadius: '12px', border: `1px solid ${t.borderSubtle}` }}>
+                          <div style={{ fontSize: '0.65rem', color: t.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Job Queue</div>
+                          <div style={{ fontSize: '1rem', fontWeight: 700 }}>Empty</div>
+                        </div>
+                      </div>
+
+                      <div style={{ padding: '16px', background: 'rgba(99,102,241,0.05)', borderRadius: '12px', border: '1px dashed rgba(99,102,241,0.3)', fontSize: '0.75rem', color: t.textSecondary }}>
+                        <div style={{ fontWeight: 800, color: '#6366f1', marginBottom: '4px' }}>AI SCALING ADVICE</div>
+                        Infrastructure is under-utilized. Recommended: Increase target lead count by 25%.
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
@@ -2051,20 +2453,124 @@ export default function Dashboard() {
             )}
 
             {activeView === 'users' && (
-              <div style={{ padding: '24px', background: t.card, border: `1px solid ${t.border}`, borderRadius: '16px' }}>
-                <h3 style={{ marginBottom: '20px' }}>User Management</h3>
-                <div style={{ padding: '12px', display: 'flex', alignItems: 'center', gap: '12px', borderBottom: `1px solid ${t.borderSubtle}` }}>
-                  <div style={{ width: 40, height: 40, borderRadius: '50%', background: '#6366f1', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>JD</div>
-                  <div>
-                    <div style={{ fontWeight: 600 }}>Agency Owner</div>
-                    <div style={{ fontSize: '0.75rem', color: t.textMuted }}>owner@agency.com • Full Access</div>
-                  </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <h2 style={{ margin: 0, fontSize: '1.8rem', fontWeight: 800, background: 'linear-gradient(135deg, #6366f1, #a855f7)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>User Management</h2>
+                  <button 
+                    onClick={() => { setEditingUser(null); setNewUser({ name: '', email: '', username: '', role: 'standard_user', status: 'Offline' }); setIsUserModalOpen(true); }}
+                    style={{ padding: '10px 24px', background: '#6366f1', color: '#fff', border: 'none', borderRadius: '12px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
+                  >
+                    <span>+</span> Add User
+                  </button>
+                </div>
+
+                <div style={{ padding: '24px', background: t.card, border: `1px solid ${t.border}`, borderRadius: '20px', overflow: 'hidden' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                    <thead>
+                      <tr style={{ textAlign: 'left', borderBottom: `1px solid ${t.border}` }}>
+                        <th style={{ padding: '16px', color: t.textMuted, fontSize: '0.8rem', fontWeight: 600 }}>IDENTITY</th>
+                        <th style={{ padding: '16px', color: t.textMuted, fontSize: '0.8rem', fontWeight: 600 }}>ROLE</th>
+                        <th style={{ padding: '16px', color: t.textMuted, fontSize: '0.8rem', fontWeight: 600 }}>STATUS</th>
+                        <th style={{ padding: '16px', color: t.textMuted, fontSize: '0.8rem', fontWeight: 600, textAlign: 'right' }}>ACTIONS</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {users.map(u => (
+                        <tr key={u.id} style={{ borderBottom: `1px solid ${t.borderSubtle}` }}>
+                          <td style={{ padding: '16px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                              <div style={{ width: 40, height: 40, borderRadius: '12px', background: 'rgba(99,102,241,0.1)', color: '#6366f1', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700 }}>
+                                {u.name?.split(' ').map(n=>n[0]).join('') || 'U'}
+                              </div>
+                              <div>
+                                <div style={{ fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                  {u.name}
+                                  {u.isOnline && <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#22c55e', boxShadow: '0 0 8px rgba(34,197,94,0.5)' }} title="Online" />}
+                                </div>
+                                <div style={{ fontSize: '0.75rem', color: t.textMuted }}>{u.email}</div>
+                              </div>
+                            </div>
+                          </td>
+                          <td style={{ padding: '16px' }}>
+                            <span style={{ padding: '4px 12px', borderRadius: '8px', fontSize: '0.75rem', fontWeight: 700, background: u.role === 'super_admin' || u.role === 'admin' ? 'rgba(99,102,241,0.1)' : (u.role === 'supervisor' ? 'rgba(245,158,11,0.1)' : 'rgba(100,116,139,0.1)'), color: u.role === 'super_admin' || u.role === 'admin' ? '#6366f1' : (u.role === 'supervisor' ? '#f59e0b' : t.textMuted) }}>
+                              {RBAC.roles[u.role]?.name || u.role}
+                            </span>
+                          </td>
+                          <td style={{ padding: '16px' }}>
+                            <span style={{ padding: '4px 12px', background: u.status === 'BLOCKED' ? 'rgba(239,68,68,0.1)' : 'rgba(34,197,94,0.1)', color: u.status === 'BLOCKED' ? '#ef4444' : '#22c55e', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 700 }}>
+                              {u.status === 'BLOCKED' ? 'Blocked' : 'Unblocked'}
+                            </span>
+                          </td>
+                          <td style={{ padding: '16px', textAlign: 'right' }}>
+                            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
+                              <button onClick={() => { setEditingUser(u); setNewUser({ name: u.fullName || u.name, username: u.username, email: u.email, role: u.role, status: u.status }); setIsUserModalOpen(true); }} style={{ padding: '6px 12px', background: 'transparent', border: `1px solid ${t.border}`, borderRadius: '8px', cursor: 'pointer', fontSize: '0.75rem', color: t.text, marginRight: '8px' }}>Edit</button>
+                              {(!ui_restrictions?.hide_delete_button && u.role !== 'super_admin' && permissions?.users?.[`can_delete_${u.role === 'super_admin' ? 'admin' : (u.role === 'standard_user' ? 'standard' : u.role)}`]) && (
+                                <button onClick={() => usersApi.delete(u.id).then(() => usersApi.list().then(setUsers))} style={{ padding: '6px 12px', background: 'transparent', border: '1px solid rgba(239,68,68,0.2)', borderRadius: '8px', cursor: 'pointer', fontSize: '0.75rem', color: '#ef4444' }}>Delete</button>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               </div>
             )}
 
             {activeView === 'system' && (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '24px', alignItems: 'start' }}>
+                <div style={{ padding: '32px', background: t.card, border: `1px solid ${t.border}`, borderRadius: '20px', gridColumn: 'span 4' }}>
+                  <div onClick={() => setIsGscAccordionOpen(!isGscAccordionOpen)} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}>
+                    <div>
+                      <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}>Google Search Console {isGscAccordionOpen ? '▴' : '▾'}</h3>
+                      <p style={{ margin: '4px 0 0 0', fontSize: '0.8rem', color: t.textMuted }}>Configure Google Search Console API metrics and tracking</p>
+                    </div>
+                  </div>
+
+                  {isGscAccordionOpen && (
+                    <div style={{ marginTop: '24px' }}>
+                      <div style={{ padding: '24px', background: t.bg, borderRadius: '16px', border: `1px solid ${t.borderSubtle}` }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+                          <div>
+                            <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: t.textMuted, marginBottom: '8px' }}>CLIENT EMAIL</label>
+                            <input
+                              type="text"
+                              placeholder="gsc-service-account@project.iam.gserviceaccount.com"
+                              value={apiKeys.gsc_client_email || ''}
+                              onChange={e => handleSaveApiKey('gsc_client_email', e.target.value)}
+                              style={{ width: '100%', padding: '12px 16px', background: t.card, border: `1px solid ${t.borderSubtle}`, borderRadius: '10px', color: t.text, outline: 'none', transition: 'all 0.2s', fontSize: '0.9rem' }}
+                            />
+                          </div>
+
+                          <div>
+                            <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: t.textMuted, marginBottom: '8px' }}>PROPERTY URI</label>
+                            <input
+                              type="text"
+                              placeholder="sc-domain:example.com or https://example.com"
+                              value={apiKeys.gsc_property_uri || ''}
+                              onChange={e => handleSaveApiKey('gsc_property_uri', e.target.value)}
+                              style={{ width: '100%', padding: '12px 16px', background: t.card, border: `1px solid ${t.borderSubtle}`, borderRadius: '10px', color: t.text, outline: 'none', transition: 'all 0.2s', fontSize: '0.9rem' }}
+                            />
+                          </div>
+
+                          <div style={{ gridColumn: 'span 2' }}>
+                            <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: t.textMuted, marginBottom: '8px' }}>PRIVATE KEY (JSON FILE)</label>
+                            <textarea
+                              placeholder='{"type": "service_account", "project_id": "...", "private_key": "-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n", ...}'
+                              value={apiKeys.gsc_private_key || ''}
+                              onChange={e => handleSaveApiKey('gsc_private_key', e.target.value)}
+                              style={{ width: '100%', height: '120px', padding: '12px 16px', background: t.card, border: `1px solid ${t.borderSubtle}`, borderRadius: '10px', color: t.text, outline: 'none', transition: 'all 0.2s', fontSize: '0.85rem', fontFamily: 'monospace', resize: 'vertical' }}
+                            />
+                            <p style={{ margin: '8px 0 0 0', fontSize: '0.75rem', color: t.textSecondary }}>
+                              Paste the <strong>entire</strong> contents of the JSON credentials file downloaded from Google Cloud Console.
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
                 <div style={{ padding: '32px', background: t.card, border: `1px solid ${t.border}`, borderRadius: '20px' }}>
                   <div onClick={() => setIsSystemAccordionOpen(!isSystemAccordionOpen)} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}>
                     <div>
@@ -2371,10 +2877,10 @@ export default function Dashboard() {
                                   <tr>
                                     <td colSpan="7" style={{ padding: '0', background: isDark ? 'rgba(0,0,0,0.2)' : 'rgba(0,0,0,0.03)' }}>
                                       <div style={{ padding: '32px', borderBottom: `1px solid ${t.border}` }}>
-                                        <div style={{ display: 'flex', gap: '24px', borderBottom: `1px solid ${t.borderSubtle}`, marginBottom: '24px' }}>
-                                          {['details', 'performance', 'communications', 'journey'].map(tab => (
+                                        <div style={{ display: 'flex', gap: '24px', borderBottom: `1px solid ${t.borderSubtle}`, marginBottom: '24px', overflowX: 'auto', whiteSpace: 'nowrap' }}>
+                                          {['details', 'performance', 'technical', 'communications', 'journey'].map(tab => (
                                             <button key={tab} onClick={() => setCrmActiveTab(tab)} style={{ padding: '12px 0', border: 'none', background: 'transparent', color: crmActiveTab === tab ? '#6366f1' : t.textMuted, fontWeight: 600, borderBottom: crmActiveTab === tab ? '2px solid #6366f1' : 'none', cursor: 'pointer', fontSize: '0.9rem', textTransform: 'capitalize' }}>
-                                              {tab}
+                                              {tab === 'technical' ? 'Technical Audit' : tab}
                                             </button>
                                           ))}
                                         </div>
@@ -2397,24 +2903,224 @@ export default function Dashboard() {
 
                                         {crmActiveTab === 'performance' && (
                                           <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
-                                              {[
-                                                { label: 'PageSpeed', val: c.pagespeedScore || 45, color: '#ef4444' },
-                                                { label: 'GTMetrix', val: c.gtmetrixScore || 52, color: '#f59e0b' },
-                                                { label: 'Pingdom', val: c.pingdomScore || 88, color: '#22c55e' }
-                                              ].map(m => (
-                                                <div key={m.label} style={{ padding: '20px', background: t.bg, borderRadius: '12px', border: `1px solid ${t.borderSubtle}`, textAlign: 'center' }}>
-                                                  <div style={{ fontSize: '0.75rem', color: t.textMuted, marginBottom: '8px', fontWeight: 700 }}>{m.label.toUpperCase()}</div>
-                                                  <div style={{ fontSize: '1.8rem', fontWeight: 800, color: m.color }}>{m.val}</div>
+                                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '24px' }}>
+                                              {/* Card 1: Reach & Engagement */}
+                                              <div style={{ padding: '32px', background: t.card, border: `1px solid ${t.border}`, borderRadius: '20px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                                                <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700 }}>Reach & Engagement</h3>
+                                                
+                                                <div style={{ display: 'flex', gap: '24px', alignItems: 'center', marginTop: '16px', flexWrap: 'wrap' }}>
+                                                  {/* Engagement Gauge */}
+                                                  <div style={{ position: 'relative', width: '120px', height: '120px', display: 'flex', justifyContent: 'center', alignItems: 'center', borderRadius: '50%', background: `conic-gradient(#6366f1 ${c.engagementScore || 0}%, ${isDark ? 'rgba(255,255,255,0.05)' : '#f1f5f9'} 0)` }}>
+                                                    <div style={{ position: 'absolute', width: '96px', height: '96px', background: t.card, borderRadius: '50%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                                                      <span style={{ fontSize: '1.8rem', fontWeight: 800 }}>{c.engagementScore || 0}%</span>
+                                                    </div>
+                                                  </div>
+
+                                                  {/* Engagement Metrics */}
+                                                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '20px', minWidth: '150px' }}>
+                                                    <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '-10px' }}>
+                                                      <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#6366f1', background: 'rgba(99,102,241,0.1)', padding: '2px 8px', borderRadius: '12px' }}>● High Engagement</span>
+                                                    </div>
+                                                    
+                                                    {[
+                                                      { label: 'Email Open Rate', val: c.emailOpenRate || 0, unit: '%' },
+                                                      { label: 'Demo View Time', val: c.demoViewTime || 0, unit: 'm' },
+                                                      { label: 'Reply Velocity', val: c.replyVelocity || 0, unit: 'd', inverse: true }
+                                                    ].map(item => (
+                                                      <div key={item.label} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', fontWeight: 600 }}>
+                                                          <span>{item.label}</span>
+                                                          <span>{item.val}{item.unit}</span>
+                                                        </div>
+                                                        <div style={{ width: '100%', height: '8px', background: isDark ? 'rgba(255,255,255,0.05)' : '#f1f5f9', borderRadius: '4px', overflow: 'hidden' }}>
+                                                          <div style={{ width: `${item.inverse ? Math.max(0, 100 - item.val * 10) : item.val}%`, height: '100%', background: '#6366f1', borderRadius: '4px' }} />
+                                                        </div>
+                                                      </div>
+                                                    ))}
+                                                  </div>
                                                 </div>
-                                              ))}
-                                            </div>
-                                            <div style={{ padding: '20px', background: 'rgba(99,102,241,0.05)', borderRadius: '12px', border: `1px solid rgba(99,102,241,0.2)` }}>
-                                              <div style={{ fontWeight: 700, fontSize: '0.9rem', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                                <span>🧠</span> AI Performance Summary
                                               </div>
-                                              <p style={{ margin: 0, fontSize: '0.85rem', color: t.textSecondary, lineHeight: '1.5' }}>
-                                                Website is severely underperforming on mobile devices with a 5.8s Largest Contentful Paint. GTMetrix indicates excessive DOM size and unoptimized images. This is a <strong>high-priority redesign candidate</strong>.
+
+                                              {/* Card 2: Journey Progression */}
+                                              <div style={{ padding: '32px', background: t.card, border: `1px solid ${t.border}`, borderRadius: '20px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                                                <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700 }}>Journey Progression</h3>
+                                                
+                                                <div style={{ display: 'flex', gap: '24px', alignItems: 'center', marginTop: '16px', flexWrap: 'wrap' }}>
+                                                  {/* Progress Chart */}
+                                                  <div style={{ position: 'relative', width: '140px', height: '140px', display: 'flex', justifyContent: 'center', alignItems: 'center', borderRadius: '50%', background: `conic-gradient(#22c55e ${c.readinessFactor || 0}%, #f59e0b ${c.churnRisk || 0}%, #ef4444 0%)` }}>
+                                                    <div style={{ position: 'absolute', width: '96px', height: '96px', background: t.card, borderRadius: '50%' }} />
+                                                  </div>
+
+                                                  {/* Journey Metrics */}
+                                                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '20px', minWidth: '150px' }}>
+                                                    {[
+                                                      { label: 'Velocity', sub: 'Days in Stage', val: c.conversionVelocity || 0, color: '#22c55e' },
+                                                      { label: 'Churn Risk', sub: 'Drop-off Prob.', val: `${c.churnRisk || 0}%`, color: '#f59e0b' },
+                                                      { label: 'Readiness', sub: 'Asset Collection', val: `${c.readinessFactor || 0}%`, color: '#3b82f6' }
+                                                    ].map(item => (
+                                                      <div key={item.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                        <div>
+                                                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem', fontWeight: 600 }}>
+                                                            <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: item.color }} />
+                                                            {item.label}
+                                                          </div>
+                                                          <div style={{ fontSize: '0.7rem', color: t.textMuted, paddingLeft: '16px' }}>{item.sub}</div>
+                                                        </div>
+                                                        <span style={{ fontSize: '1rem', fontWeight: 800 }}>{item.val}</span>
+                                                      </div>
+                                                    ))}
+                                                  </div>
+                                                </div>
+                                              </div>
+
+                                              {/* Card 3: Business Impact (Estimated) */}
+                                              <div style={{ padding: '32px', background: t.card, border: `1px solid ${t.border}`, borderRadius: '20px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                  <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700 }}>Business Impact</h3>
+                                                  <div style={{ padding: '4px 8px', background: '#22c55e15', color: '#22c55e', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 700 }}>PROJECTION</div>
+                                                </div>
+                                                
+                                                <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginTop: '16px' }}>
+                                                  {[
+                                                    { label: 'Monthly Lead Jump', val: `+${c.monthlyLeadProjection || 0}`, pct: 85, color: '#22c55e', unit: 'Leads' },
+                                                    { label: 'ROI Factor', val: `${c.roiFactor || 0}x`, pct: 75, color: '#22c55e', unit: 'Multiplier' },
+                                                    { label: 'Automation Savings', val: `${c.automationSavings || 0}h`, pct: 65, color: '#22c55e', unit: 'Hrs / Mo' }
+                                                  ].map(item => (
+                                                    <div key={item.label} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+                                                        <div>
+                                                          <div style={{ fontSize: '0.85rem', fontWeight: 600 }}>{item.label}</div>
+                                                          <div style={{ fontSize: '0.7rem', color: t.textMuted }}>Target {item.unit}</div>
+                                                        </div>
+                                                        <div style={{ fontSize: '1.2rem', fontWeight: 800, color: item.color }}>{item.val}</div>
+                                                      </div>
+                                                      <div style={{ width: '100%', height: '10px', background: isDark ? 'rgba(255,255,255,0.05)' : '#f1f5f9', borderRadius: '5px', overflow: 'hidden' }}>
+                                                        <div style={{ width: `${item.pct}%`, height: '100%', background: `linear-gradient(90deg, ${item.color}88, ${item.color})`, borderRadius: '5px' }} />
+                                                      </div>
+                                                    </div>
+                                                  ))}
+                                                </div>
+                                              </div>
+                                            </div>
+
+                                            {/* Journey AI Summary */}
+                                            <div style={{ padding: '24px', background: 'linear-gradient(135deg, rgba(99,102,241,0.05), rgba(168,85,247,0.05))', border: `1px solid ${t.border}`, borderRadius: '16px', display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
+                                              <span style={{ fontSize: '1.5rem' }}>🧠</span>
+                                              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                                <div style={{ fontWeight: 700, fontSize: '0.9rem' }}>Lead Sentiment & Next Best Action</div>
+                                                <div style={{ fontSize: '0.85rem', color: t.textMuted, lineHeight: 1.5 }}>
+                                                  Based on {c.engagementScore}% engagement and a reply velocity of {c.replyVelocity} days, this lead shows **{c.engagementScore > 80 ? 'High Intent' : 'Moderate Interest'}**. 
+                                                  Recommended action: {c.stage === 'delivered' ? 'Upsell to Managed SEO services.' : 'Schedule follow-up call to close proposal.'}
+                                                </div>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        )}
+
+                                        {crmActiveTab === 'technical' && (
+                                          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '24px' }}>
+                                              {/* Card 1: Listings Accuracy */}
+                                              <div style={{ padding: '32px', background: t.card, border: `1px solid ${t.border}`, borderRadius: '20px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                                                <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700 }}>Listings Accuracy</h3>
+                                                
+                                                <div style={{ display: 'flex', gap: '24px', alignItems: 'center', marginTop: '16px', flexWrap: 'wrap' }}>
+                                                  {/* Circular Progress */}
+                                                  <div style={{ position: 'relative', width: '120px', height: '120px', display: 'flex', justifyContent: 'center', alignItems: 'center', borderRadius: '50%', background: `conic-gradient(#22c55e 72%, ${isDark ? 'rgba(255,255,255,0.05)' : '#f1f5f9'} 0)` }}>
+                                                    <div style={{ position: 'absolute', width: '96px', height: '96px', background: t.card, borderRadius: '50%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                                                      <span style={{ fontSize: '1.8rem', fontWeight: 800 }}>72%</span>
+                                                    </div>
+                                                  </div>
+
+                                                  {/* Bars */}
+                                                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '20px', minWidth: '150px' }}>
+                                                    <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '-10px' }}>
+                                                      <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#22c55e', background: 'rgba(34,197,94,0.1)', padding: '2px 8px', borderRadius: '12px' }}>● 72% Accurate</span>
+                                                    </div>
+                                                    
+                                                    {[ { label: 'Business Name', val: 73 }, { label: 'Address', val: 70 }, { label: 'Phone', val: 73 } ].map(item => (
+                                                      <div key={item.label} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', fontWeight: 600 }}>
+                                                          <span>{item.label}</span>
+                                                          <span>{item.val}%</span>
+                                                        </div>
+                                                        <div style={{ width: '100%', height: '8px', background: isDark ? 'rgba(255,255,255,0.05)' : '#f1f5f9', borderRadius: '4px', overflow: 'hidden' }}>
+                                                          <div style={{ width: `${item.val}%`, height: '100%', background: '#22c55e', borderRadius: '4px' }} />
+                                                        </div>
+                                                      </div>
+                                                    ))}
+                                                  </div>
+                                                </div>
+                                              </div>
+
+                                              {/* Card 2: Online Health Score */}
+                                              <div style={{ padding: '32px', background: t.card, border: `1px solid ${t.border}`, borderRadius: '20px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                                                <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700 }}>Online Health Score</h3>
+                                                
+                                                <div style={{ display: 'flex', gap: '24px', alignItems: 'center', marginTop: '16px', flexWrap: 'wrap' }}>
+                                                  {/* Donut Chart */}
+                                                  <div style={{ position: 'relative', width: '140px', height: '140px', display: 'flex', justifyContent: 'center', alignItems: 'center', borderRadius: '50%', background: 'conic-gradient(#22c55e 0% 67%, #3b82f6 67% 76%, #ef4444 76% 100%)' }}>
+                                                    <div style={{ position: 'absolute', width: '96px', height: '96px', background: t.card, borderRadius: '50%' }} />
+                                                  </div>
+
+                                                  {/* Legend */}
+                                                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '20px', minWidth: '150px' }}>
+                                                    {[ 
+                                                      { label: 'Match', val: '22 / 33', pct: '67%', color: '#22c55e' },
+                                                      { label: 'Partial Match', val: '3 / 33', pct: '9%', color: '#3b82f6' },
+                                                      { label: 'No Match', val: '8 / 33', pct: '24%', color: '#ef4444' }
+                                                    ].map(item => (
+                                                      <div key={item.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                        <div>
+                                                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem', fontWeight: 600 }}>
+                                                            <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: item.color }} />
+                                                            {item.label}
+                                                          </div>
+                                                          <div style={{ fontSize: '1.2rem', fontWeight: 800, marginTop: '4px', paddingLeft: '16px' }}>{item.val}</div>
+                                                        </div>
+                                                        <span style={{ fontSize: '0.8rem', fontWeight: 700, color: item.color, background: `${item.color}15`, padding: '4px 8px', borderRadius: '8px' }}>{item.pct}</span>
+                                                      </div>
+                                                    ))}
+                                                  </div>
+                                                </div>
+                                              </div>
+
+                                              {/* Card 3: Performance Audit (Speed Metrics) */}
+                                              <div style={{ padding: '32px', background: t.card, border: `1px solid ${t.border}`, borderRadius: '20px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                  <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700 }}>Site Performance</h3>
+                                                  <span style={{ fontSize: '1.3rem' }}>⚡</span>
+                                                </div>
+                                                
+                                                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                                                  {[
+                                                    { label: 'PageSpeed Insights', val: c.pagespeedScore || 42, color: (c.pagespeedScore || 42) > 80 ? '#22c55e' : (c.pagespeedScore || 42) > 50 ? '#f59e0b' : '#ef4444', desc: (c.pagespeedScore || 42) < 50 ? 'Critical: LCP > 2.5s' : 'Good Core Web Vitals' },
+                                                    { label: 'GTMetrix Grade', val: c.gtmetrixScore || 56, color: (c.gtmetrixScore || 56) > 80 ? '#22c55e' : (c.gtmetrixScore || 56) > 50 ? '#f59e0b' : '#ef4444', desc: `Grade: ${(c.gtmetrixScore || 56) > 90 ? 'A' : (c.gtmetrixScore || 56) > 80 ? 'B' : (c.gtmetrixScore || 56) > 60 ? 'C' : 'D'} (${(c.gtmetrixScore || 56) > 60 ? 'Acceptable' : 'Poor'})` },
+                                                    { label: 'Pingdom Uptime', val: c.pingdomScore || 98, color: (c.pingdomScore || 98) > 99 ? '#22c55e' : (c.pingdomScore || 98) > 95 ? '#f59e0b' : '#ef4444', desc: 'Global Availability Monitoring' }
+                                                  ].map(item => (
+                                                    <div key={item.label}>
+                                                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', fontWeight: 600, marginBottom: '6px' }}>
+                                                        <span>{item.label}</span>
+                                                        <span style={{ color: item.color }}>{item.val}%</span>
+                                                      </div>
+                                                      <div style={{ width: '100%', height: '6px', background: isDark ? 'rgba(255,255,255,0.05)' : '#f1f5f9', borderRadius: '3px', overflow: 'hidden', marginBottom: '4px' }}>
+                                                        <div style={{ width: `${item.val}%`, height: '100%', background: item.color, borderRadius: '3px' }} />
+                                                      </div>
+                                                      <div style={{ fontSize: '0.7rem', color: t.textMuted }}>{item.desc}</div>
+                                                    </div>
+                                                  ))}
+                                                </div>
+                                              </div>
+                                            </div>
+
+                                            {/* AI Optimization Summary */}
+                                            <div style={{ padding: '24px', background: 'rgba(99,102,241,0.05)', borderRadius: '20px', border: `1px solid rgba(99,102,241,0.2)` }}>
+                                              <div style={{ fontWeight: 700, fontSize: '1rem', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                                <span style={{ fontSize: '1.2rem' }}>🔧</span> AI Technical Assessment
+                                              </div>
+                                              <p style={{ margin: 0, fontSize: '0.9rem', color: t.textSecondary, lineHeight: '1.6' }}>
+                                                The audit for {c.name} reveals {c.pagespeedScore < 60 ? 'significant technical debt' : 'minor optimization opportunities'}. 
+                                                Improving local listings and addressing PageSpeed core web vitals will directly impact conversion.
                                               </p>
                                             </div>
                                           </div>
@@ -2527,6 +3233,75 @@ export default function Dashboard() {
       </main>
 
       {/* Modals */}
+      {isUserModalOpen && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+          <div style={{ background: t.card, padding: '32px', borderRadius: '24px', width: '100%', maxWidth: '480px', border: `1px solid ${t.border}`, boxShadow: '0 24px 48px rgba(0,0,0,0.4)' }} onClick={e => e.stopPropagation()}>
+            <h2 style={{ margin: '0 0 24px 0', fontSize: '1.5rem', fontWeight: 800 }}>{editingUser ? 'Edit User' : 'Add New User'}</h2>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <label style={{ fontSize: '0.8rem', fontWeight: 700, color: t.textMuted }}>FULL NAME</label>
+                <input 
+                  type="text" 
+                  value={newUser.name || newUser.fullName || ''} 
+                  onChange={e => setNewUser({...newUser, name: e.target.value})}
+                  placeholder="Enter full name"
+                  style={{ width: '100%', padding: '12px 16px', background: t.bg, border: `1px solid ${t.borderSubtle}`, borderRadius: '12px', color: t.text, outline: 'none' }}
+                />
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <label style={{ fontSize: '0.8rem', fontWeight: 700, color: t.textMuted }}>USERNAME</label>
+                <input 
+                  type="text" 
+                  value={newUser.username} 
+                  disabled={!!editingUser}
+                  onChange={e => setNewUser({...newUser, username: e.target.value})}
+                  placeholder="Enter username"
+                  style={{ width: '100%', padding: '12px 16px', background: editingUser ? 'rgba(0,0,0,0.1)' : t.bg, border: `1px solid ${t.borderSubtle}`, borderRadius: '12px', color: editingUser ? t.textMuted : t.text, outline: 'none' }}
+                />
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <label style={{ fontSize: '0.8rem', fontWeight: 700, color: t.textMuted }}>EMAIL ADDRESS</label>
+                <input 
+                  type="email" 
+                  value={newUser.email} 
+                  onChange={e => setNewUser({...newUser, email: e.target.value})}
+                  placeholder="name@agency.com"
+                  style={{ width: '100%', padding: '12px 16px', background: t.bg, border: `1px solid ${t.borderSubtle}`, borderRadius: '12px', color: t.text, outline: 'none' }}
+                />
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <label style={{ fontSize: '0.8rem', fontWeight: 700, color: t.textMuted }}>ROLE</label>
+                  <select 
+                    value={newUser.role} 
+                    onChange={e => setNewUser({...newUser, role: e.target.value})}
+                    style={{ width: '100%', padding: '12px 16px', background: t.bg, border: `1px solid ${t.borderSubtle}`, borderRadius: '12px', color: t.text, outline: 'none' }}
+                  >
+                    {permissions?.users?.can_create_admin && <option value="admin">Admin</option>}
+                    {permissions?.users?.can_create_supervisor && <option value="supervisor">Supervisor</option>}
+                    {permissions?.users?.can_create_standard && <option value="standard_user">Standard User</option>}
+                  </select>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <label style={{ fontSize: '0.8rem', fontWeight: 700, color: t.textMuted }}>STATUS</label>
+                  <select 
+                    value={newUser.status} 
+                    onChange={e => setNewUser({...newUser, status: e.target.value})}
+                    style={{ width: '100%', padding: '12px 16px', background: t.bg, border: `1px solid ${t.borderSubtle}`, borderRadius: '12px', color: t.text, outline: 'none' }}
+                  >
+                    <option value="UNBLOCKED">Unblocked</option>
+                    <option value="BLOCKED">Blocked</option>
+                  </select>
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: '12px', marginTop: '12px' }}>
+                <button onClick={() => setIsUserModalOpen(false)} style={{ flex: 1, padding: '14px', background: 'transparent', border: `1px solid ${t.border}`, borderRadius: '12px', fontWeight: 700, cursor: 'pointer', color: t.text }}>Cancel</button>
+                <button onClick={handleSaveUser} style={{ flex: 1, padding: '14px', background: '#6366f1', color: '#fff', border: 'none', borderRadius: '12px', fontWeight: 700, cursor: 'pointer' }}>{editingUser ? 'Save Changes' : 'Create User'}</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
       {
         isCampaignModalOpen && (
           <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(2,8,23,0.8)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }} onClick={() => setIsCampaignModalOpen(false)}>

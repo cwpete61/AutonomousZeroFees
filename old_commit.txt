@@ -1,0 +1,269 @@
+commit 4f5013cf0387c0fc7a14bd10303735f8b10f19b1
+Author: Crawford Peterson <crawford.peterson.sr@gmail.com>
+Date:   Sun Mar 8 22:19:12 2026 -0400
+
+    feat: enhance API hub stats and layout, update Scout Agent performance integration, and finalize Phase 10 deployment docs
+
+diff --git a/apps/dashboard/web-agency-dashboard.jsx b/apps/dashboard/web-agency-dashboard.jsx
+index a061966..d379735 100644
+--- a/apps/dashboard/web-agency-dashboard.jsx
++++ b/apps/dashboard/web-agency-dashboard.jsx
+@@ -277,10 +277,9 @@ const API_COST_MODELS = {
+     icon: '🖼️',
+     link: 'https://runware.ai/',
+     models: [
+-      { id: 'runware:400@2', name: 'Runware 400@2', costPerLead: 0.00078, description: 'Ultra-fast basic generation' },
+-      { id: 'qwen-image-2512', name: 'Qwen-Image-2512', costPerLead: 0.035, description: 'High-fidelity cinematic' },
+-      { id: 'seedream-5-lite', name: 'Seedream 5.0 Lite', costPerLead: 0.035, description: 'Artistic realism' },
+-      { id: 'grok-imagine', name: 'Grok Imagine', costPerLead: 0.02, description: 'Creative and diverse' }
++      { id: 'runware:400@3', name: 'Runware 400@3', costPerLead: 0.00078, description: 'Ultra-fast basic generation' },
++      { id: 'bytedance:seedream@5.0-lite', name: 'Seedream 5.0 Lite', costPerLead: 0.035, description: 'Artistic realism' },
++      { id: 'runware:z-image@0', name: 'Z-Image', costPerLead: 0.012, description: 'High quality generation' }
+     ]
+   },
+ };
+@@ -353,7 +352,8 @@ export default function Dashboard() {
+   const [testStatus, setTestStatus] = useState({});
+   const [selectedModels, setSelectedModels] = useState({
+     openai: 'gpt-4o',
+-    claude: 'claude-3-5-sonnet'
++    claude: 'claude-3-5-sonnet',
++    runware: 'runware:400@3'
+   });
+   const [masterConnect, setMasterConnect] = useState(true);
+ 
+@@ -521,7 +521,12 @@ export default function Dashboard() {
+ 
+     const savedModels = localStorage.getItem('orbis_api_models');
+     if (savedModels) {
+-      try { setSelectedModels(JSON.parse(savedModels)); } catch (e) { /* ignore */ }
++      try { 
++        const parsed = JSON.parse(savedModels);
++        if (parsed && typeof parsed === 'object') {
++          setSelectedModels(prev => ({ ...prev, ...parsed }));
++        }
++      } catch (e) { /* ignore */ }
+     }
+ 
+     return () => clearInterval(pollInterval);
+@@ -1030,6 +1035,11 @@ export default function Dashboard() {
+   const safeCrmData = Array.isArray(crmData) ? crmData : [];
+   const safeCampaigns = Array.isArray(campaigns) ? campaigns : [];
+ 
++  const totalApisCount = Object.keys(API_COST_MODELS || {}).length;
++  const activeApisCount = Object.keys(apiKeys || {}).filter(k => apiKeys[k]).length;
++  const llmCount = 3; // OpenAI, Claude, Runware
++  const serviceProviderCount = totalApisCount - llmCount;
++
+   const leadsPerStage = (PIPELINE_STAGES || []).map(stage => ({
+     ...stage,
+     leads: (safeCrmData || []).filter(l => l.stage === stage.id),
+@@ -1264,15 +1274,26 @@ export default function Dashboard() {
+         {hasMounted ? (
+           <>
+             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '32px' }}>
+-              {[
+-                { label: 'Total Leads', value: safeCrmData.length, color: '#6366f1' },
+-                { label: 'Campaigns', value: safeCampaigns.length, color: '#22c55e' },
+-                { label: 'Conversion', value: '11%', color: '#f59e0b' },
+-                { label: 'Revenue', value: '$2,994', color: '#14b8a6' },
+-              ].map((stat, i) => (
+-                <div key={i} style={{ padding: '20px', background: t.card, border: `1px solid ${t.border}`, borderRadius: '12px' }}>
+-                  <div style={{ fontSize: '0.8rem', color: t.textMuted }}>{stat.label}</div>
+-                  <div style={{ fontSize: '1.8rem', fontWeight: 700, color: stat.color }}>{stat.value}</div>
++              {(activeView === 'api' ? [
++                { label: 'Total APIs', value: totalApisCount, color: '#6366f1', pct: 100 },
++                { label: 'Active APIs', value: activeApisCount, color: '#22c55e', pct: totalApisCount > 0 ? (activeApisCount / totalApisCount) * 100 : 0 },
++                { label: 'Total LLMs', value: llmCount, color: '#f59e0b', pct: 100 },
++                { label: 'Service Providers', value: serviceProviderCount, color: '#14b8a6', pct: 100 },
++              ] : [
++                { label: 'Total Leads', value: safeCrmData.length, color: '#6366f1', pct: safeCrmData.length > 0 ? Math.min((safeCrmData.length / 100) * 100, 100) : 0 },
++                { label: 'Campaigns', value: safeCampaigns.length, color: '#22c55e', pct: safeCampaigns.length > 0 ? Math.min((safeCampaigns.length / 10) * 100, 100) : 0 },
++                { label: 'Conversion', value: '11%', color: '#f59e0b', pct: 11 },
++                { label: 'Revenue', value: '$2,994', color: '#14b8a6', pct: 60 },
++              ]).map((stat, i) => (
++                <div key={i} style={{ padding: '20px', background: t.card, border: `1px solid ${t.border}`, borderRadius: '12px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
++                  <div>
++                    <div style={{ fontSize: '0.8rem', color: t.textMuted }}>{stat.label}</div>
++                    <div style={{ fontSize: '1.8rem', fontWeight: 700, color: stat.color }}>{stat.value}</div>
++                  </div>
++                  {/* Bar Graph Graphic */}
++                  <div style={{ width: '100%', height: '6px', background: isDark ? 'rgba(255,255,255,0.05)' : '#f1f5f9', borderRadius: '3px', overflow: 'hidden' }}>
++                    <div style={{ width: `${stat.pct}%`, height: '100%', background: stat.color, borderRadius: '3px', transition: 'width 1s ease-in-out' }} />
++                  </div>
+                 </div>
+               ))}
+             </div>
+@@ -1868,14 +1889,114 @@ export default function Dashboard() {
+             )}
+ 
+             {activeView === 'analytics' && (
+-              <div style={{ padding: '40px', textAlign: 'center', background: t.card, borderRadius: '20px', border: `1px solid ${t.border}` }}>
+-                <div style={{ fontSize: '3rem', marginBottom: '20px' }}>📈</div>
+-                <h3>Advanced Analytics Engine</h3>
+-                <p style={{ color: t.textMuted }}>Predictive modeling and revenue forecasting are being calibrated.</p>
+-                <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', marginTop: '30px' }}>
+-                  {[40, 70, 45, 90, 65, 80, 50].map((h, i) => (
+-                    <div key={i} style={{ width: 30, height: h, background: '#6366f1', borderRadius: '4px', opacity: 0.3 + (i * 0.1) }} />
+-                  ))}
++              <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
++                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
++                  <div>
++                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
++                      <h2 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 800 }}>Listings</h2>
++                      <span style={{ padding: '4px 10px', borderRadius: '20px', background: 'rgba(34, 197, 94, 0.15)', color: '#22c55e', fontSize: '0.8rem', fontWeight: 800 }}>72%</span>
++                    </div>
++                    <p style={{ margin: 0, fontSize: '0.85rem', color: t.textSecondary, maxWidth: '800px', lineHeight: '1.6' }}>
++                      Hmm, Looks like you are listed incorrectly in few of the websites. Customers are more likely to trust a business with a complete, accurate, and up-to-date business information. A few incorrect listings may hurt your business in the long-run.
++                    </p>
++                  </div>
++                </div>
++
++                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '24px' }}>
++                  {/* Card 1: Listings Accuracy */}
++                  <div style={{ padding: '32px', background: t.card, border: `1px solid ${t.border}`, borderRadius: '20px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
++                    <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700 }}>Listings</h3>
++                    
++                    <div style={{ display: 'flex', gap: '24px', alignItems: 'center', marginTop: '16px', flexWrap: 'wrap' }}>
++                      {/* Circular Progress */}
++                      <div style={{ position: 'relative', width: '120px', height: '120px', display: 'flex', justifyContent: 'center', alignItems: 'center', borderRadius: '50%', background: `conic-gradient(#22c55e 72%, ${isDark ? 'rgba(255,255,255,0.05)' : '#f1f5f9'} 0)` }}>
++                        <div style={{ position: 'absolute', width: '96px', height: '96px', background: t.card, borderRadius: '50%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
++                          <span style={{ fontSize: '1.8rem', fontWeight: 800 }}>72%</span>
++                        </div>
++                      </div>
++
++                      {/* Bars */}
++                      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '20px', minWidth: '150px' }}>
++                        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '-10px' }}>
++                          <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#22c55e', background: 'rgba(34,197,94,0.1)', padding: '2px 8px', borderRadius: '12px' }}>● 72% Accurate</span>
++                        </div>
++                        
++                        {[ { label: 'Business Name', val: 73 }, { label: 'Address', val: 70 }, { label: 'Phone', val: 73 } ].map(item => (
++                          <div key={item.label} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
++                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', fontWeight: 600 }}>
++                              <span>{item.label}</span>
++                              <span>{item.val}%</span>
++                            </div>
++                            <div style={{ width: '100%', height: '8px', background: isDark ? 'rgba(255,255,255,0.05)' : '#f1f5f9', borderRadius: '4px', overflow: 'hidden' }}>
++                              <div style={{ width: `${item.val}%`, height: '100%', background: '#22c55e', borderRadius: '4px' }} />
++                            </div>
++                          </div>
++                        ))}
++                      </div>
++                    </div>
++                  </div>
++
++                  {/* Card 2: Online Health Score */}
++                  <div style={{ padding: '32px', background: t.card, border: `1px solid ${t.border}`, borderRadius: '20px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
++                    <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700 }}>Online Health Score</h3>
++                    
++                    <div style={{ display: 'flex', gap: '24px', alignItems: 'center', marginTop: '16px', flexWrap: 'wrap' }}>
++                      {/* Donut Chart */}
++                      <div style={{ position: 'relative', width: '140px', height: '140px', display: 'flex', justifyContent: 'center', alignItems: 'center', borderRadius: '50%', background: 'conic-gradient(#22c55e 0% 67%, #3b82f6 67% 76%, #ef4444 76% 100%)' }}>
++                        <div style={{ position: 'absolute', width: '96px', height: '96px', background: t.card, borderRadius: '50%' }} />
++                      </div>
++
++                      {/* Legend */}
++                      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '20px', minWidth: '150px' }}>
++                        {[ 
++                          { label: 'Match', val: '22 / 33', pct: '67%', color: '#22c55e' },
++                          { label: 'Partial Match', val: '3 / 33', pct: '9%', color: '#3b82f6' },
++                          { label: 'No Match', val: '8 / 33', pct: '24%', color: '#ef4444' }
++                        ].map(item => (
++                          <div key={item.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
++                            <div>
++                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem', fontWeight: 600 }}>
++                                <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: item.color }} />
++                                {item.label}
++                              </div>
++                              <div style={{ fontSize: '1.2rem', fontWeight: 800, marginTop: '4px', paddingLeft: '16px' }}>{item.val}</div>
++                            </div>
++                            <span style={{ fontSize: '0.8rem', fontWeight: 700, color: item.color, background: `${item.color}15`, padding: '4px 8px', borderRadius: '8px' }}>{item.pct}</span>
++                          </div>
++                        ))}
++                      </div>
++                    </div>
++                  </div>
++
++                  {/* Card 3: Performance Audit (GTMetrix & Pingdom) */}
++                  <div style={{ padding: '32px', background: t.card, border: `1px solid ${t.border}`, borderRadius: '20px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
++                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
++                      <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700 }}>Performance Audit</h3>
++                      <span style={{ fontSize: '1.3rem' }}>⚡</span>
++                    </div>
++                    
++                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
++                      {[
++                        { label: 'PageSpeed Insights', val: 42, color: '#ef4444', desc: 'Critical: LCP > 2.5s' },
++                        { label: 'GTMetrix Grade', val: 56, color: '#f59e0b', desc: 'Grade: D (Poor)' },
++                        { label: 'Pingdom Uptime', val: 98, color: '#22c55e', desc: 'Avg Response: 840ms' }
++                      ].map(item => (
++                        <div key={item.label}>
++                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', fontWeight: 600, marginBottom: '6px' }}>
++                            <span>{item.label}</span>
++                            <span style={{ color: item.color }}>{item.val}%</span>
++                          </div>
++                          <div style={{ width: '100%', height: '6px', background: isDark ? 'rgba(255,255,255,0.05)' : '#f1f5f9', borderRadius: '3px', overflow: 'hidden', marginBottom: '4px' }}>
++                            <div style={{ width: `${item.val}%`, height: '100%', background: item.color, borderRadius: '3px' }} />
++                          </div>
++                          <div style={{ fontSize: '0.7rem', color: t.textMuted }}>{item.desc}</div>
++                        </div>
++                      ))}
++                    </div>
++                  </div>
++
++                  {/* Card 4: Google Search Console */}
++
+                 </div>
+               </div>
+             )}
+@@ -1943,7 +2064,7 @@ export default function Dashboard() {
+             )}
+ 
+             {activeView === 'system' && (
+-              <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
++              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '24px', alignItems: 'start' }}>
+                 <div style={{ padding: '32px', background: t.card, border: `1px solid ${t.border}`, borderRadius: '20px' }}>
+                   <div onClick={() => setIsSystemAccordionOpen(!isSystemAccordionOpen)} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}>
+                     <div>
+@@ -2251,7 +2372,7 @@ export default function Dashboard() {
+                                     <td colSpan="7" style={{ padding: '0', background: isDark ? 'rgba(0,0,0,0.2)' : 'rgba(0,0,0,0.03)' }}>
+                                       <div style={{ padding: '32px', borderBottom: `1px solid ${t.border}` }}>
+                                         <div style={{ display: 'flex', gap: '24px', borderBottom: `1px solid ${t.borderSubtle}`, marginBottom: '24px' }}>
+-                                          {['details', 'communications', 'journey'].map(tab => (
++                                          {['details', 'performance', 'communications', 'journey'].map(tab => (
+                                             <button key={tab} onClick={() => setCrmActiveTab(tab)} style={{ padding: '12px 0', border: 'none', background: 'transparent', color: crmActiveTab === tab ? '#6366f1' : t.textMuted, fontWeight: 600, borderBottom: crmActiveTab === tab ? '2px solid #6366f1' : 'none', cursor: 'pointer', fontSize: '0.9rem', textTransform: 'capitalize' }}>
+                                               {tab}
+                                             </button>
+@@ -2274,6 +2395,31 @@ export default function Dashboard() {
+                                           </div>
+                                         )}
+ 
++                                        {crmActiveTab === 'performance' && (
++                                          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
++                                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
++                                              {[
++                                                { label: 'PageSpeed', val: c.pagespeedScore || 45, color: '#ef4444' },
++                                                { label: 'GTMetrix', val: c.gtmetrixScore || 52, color: '#f59e0b' },
++                                                { label: 'Pingdom', val: c.pingdomScore || 88, color: '#22c55e' }
++                                              ].map(m => (
++                                                <div key={m.label} style={{ padding: '20px', background: t.bg, borderRadius: '12px', border: `1px solid ${t.borderSubtle}`, textAlign: 'center' }}>
++                                                  <div style={{ fontSize: '0.75rem', color: t.textMuted, marginBottom: '8px', fontWeight: 700 }}>{m.label.toUpperCase()}</div>
++                                                  <div style={{ fontSize: '1.8rem', fontWeight: 800, color: m.color }}>{m.val}</div>
++                                                </div>
++                                              ))}
++                                            </div>
++                                            <div style={{ padding: '20px', background: 'rgba(99,102,241,0.05)', borderRadius: '12px', border: `1px solid rgba(99,102,241,0.2)` }}>
++                                              <div style={{ fontWeight: 700, fontSize: '0.9rem', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
++                                                <span>🧠</span> AI Performance Summary
++                                              </div>
++                                              <p style={{ margin: 0, fontSize: '0.85rem', color: t.textSecondary, lineHeight: '1.5' }}>
++                                                Website is severely underperforming on mobile devices with a 5.8s Largest Contentful Paint. GTMetrix indicates excessive DOM size and unoptimized images. This is a <strong>high-priority redesign candidate</strong>.
++                                              </p>
++                                            </div>
++                                          </div>
++                                        )}
++
+                                         {crmActiveTab === 'communications' && (
+                                           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>

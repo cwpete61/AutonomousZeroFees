@@ -5,10 +5,9 @@ export async function apiFetch(endpoint: string, options: RequestInit = {}) {
     const token = typeof window !== 'undefined' ? localStorage.getItem('orbis_token') : null;
     const masterSync = typeof window !== 'undefined' ? localStorage.getItem('orbis_master_sync') : 'true';
 
-    if (masterSync === 'false') {
-        const err = new Error('Master Sync is Offline');
-        (err as any).isOffline = true;
-        throw err;
+    const isAuthRoute = endpoint.includes('/auth/');
+    if (!isAuthRoute && masterSync === 'false') {
+        return Promise.reject({ message: 'Master Sync is Offline', isOffline: true });
     }
 
     const headers = {
@@ -31,7 +30,8 @@ export async function apiFetch(endpoint: string, options: RequestInit = {}) {
             throw new Error(error.message || `HTTP error! status: ${response.status}`);
         }
 
-        return await response.json();
+        const text = await response.text();
+        return text ? JSON.parse(text) : null;
     } catch (error) {
         console.error(`API Fetch Error [${url}]:`, error);
         throw error;
@@ -91,4 +91,19 @@ export const aiApi = {
         method: 'POST',
         body: JSON.stringify(data)
     }),
+};
+
+export const usersApi = {
+    list: () => apiFetch('/users'),
+    create: (data: any) => apiFetch('/users', { method: 'POST', body: JSON.stringify(data) }),
+    update: (id: string, data: any) => apiFetch(`/users/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
+    delete: (id: string) => apiFetch(`/users/${id}`, { method: 'DELETE' }),
+};
+
+export const authApi = {
+    login: (credentials: { identifier: string; password: string }) => 
+        apiFetch('/auth/login', { method: 'POST', body: JSON.stringify(credentials) }),
+    forgotCredentials: (identifier: string) => 
+        apiFetch('/auth/forgot-credentials', { method: 'POST', body: JSON.stringify({ identifier }) }),
+    getProfile: () => apiFetch('/auth/profile'),
 };

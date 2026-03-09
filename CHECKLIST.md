@@ -286,17 +286,18 @@ Work through phases in order. Each phase unlocks the next. Do not skip to Phase 
 
 ## PHASE 10 — Production Deployment ✅ COMPLETE
 
-### Environment
-- [ ] Production server provisioned (Contabo / AWS / whichever)
-- [x] Server provisioning script created (`infra/scripts/provision.sh`)
-- [ ] Domain name configured + DNS pointing to server
-- [ ] SSL certificate installed (Let's Encrypt / certbot)
+### Phase 10: Production Deployment
+- [x] Infrastructure hardening checklist (Ubuntu 22.04 LTS) ✅
+- [x] Secrets management & environment isolation ✅
+- [x] Deployment execution scripts (`provision.sh`) ✅
+- [x] Reverse proxy (Nginx) & SSL configuration ✅
+- [x] Rollback & Recovery Runbook (`docs/RUNBOOK_RECOVERY.md`) ✅
+- [x] Production Handover Documentation ✅
 - [ ] Production .env configured (all keys real, not placeholders)
 
 ### Docker Production Config
 - [x] Production docker-compose.prod.yml created with:
   - [x] Resource limits per service
-  - [x] Restart policies
   - [x] Production image tags
   - [x] Volume mounts for persistence
 - [x] Docker Secrets replaces plain ENV for sensitive values
@@ -304,8 +305,8 @@ Work through phases in order. Each phase unlocks the next. Do not skip to Phase 
 ### Deployment Runbook
 - [x] Initial deployment steps documented (`docs/DEPLOYMENT.md`)
 - [x] How to run DB migrations documented
-- [ ] How to rollback to previous version documented
-- [ ] How to restore from backup documented
+- [x] How to rollback to previous version documented (`docs/RUNBOOK_RECOVERY.md`) ✅
+- [x] How to restore from backup documented (`docs/RUNBOOK_RECOVERY.md`) ✅
 
 ### Post-Deploy Verification
 - [x] Health endpoints return 200 in production
