@@ -22,7 +22,9 @@ export class RolesGuard implements CanActivate {
     
     console.log(`[RolesGuard] User ID: ${user?.userId}, Email: ${user?.email}, Role: ${userRole}, Roles: ${JSON.stringify(userRoles)}, Required: ${JSON.stringify(requiredRoles)}`);
     
-    const hasRole = requiredRoles.some((role) => userRoles.includes(role));
+    const hasRole = requiredRoles.some((role) => 
+      userRoles.some((userRole: string) => userRole.toUpperCase() === role.toUpperCase())
+    );
     console.log(`[RolesGuard] Access: ${hasRole}`);
     
     return hasRole;
