@@ -24,6 +24,7 @@ async function bootstrap() {
     process.env.DASHBOARD_URL,
     'http://localhost:3000',
     'http://localhost:30000',
+    'http://localhost:30001',
   ].filter((o): o is string => !!o);
 
   app.enableCors({

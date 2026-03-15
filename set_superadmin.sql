@@ -7,7 +7,7 @@ VALUES (
     'Super Admin',
     '$2b$10$hlb.Cape25Ro6qICamqENuZl/Bf27S/SKbmjItYFa81PY2xXcl9u6',
     'SUPER_ADMIN',
-    'ACTIVE',
+    'UNBLOCKED',
     NOW(),
     NOW()
 ) ON CONFLICT (id) DO UPDATE SET 
