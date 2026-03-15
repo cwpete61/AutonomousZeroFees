@@ -28,4 +28,4 @@ RUN cd packages/db && npx prisma generate
 RUN pnpm install --prod --frozen-lockfile --filter=@agency/api
 
 EXPOSE 4000
-CMD ["node", "apps/api/dist/apps/api/src/main.js"]
+CMD ["node", "apps/api/dist/main.js"]

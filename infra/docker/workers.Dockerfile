@@ -31,4 +31,4 @@ RUN cd packages/db && npx prisma generate
 RUN pnpm install --prod --frozen-lockfile --filter=@agency/workers
 
 EXPOSE 4001
-CMD ["node", "apps/workers/dist/apps/workers/src/main.js"]
+CMD ["node", "apps/workers/dist/main.js"]

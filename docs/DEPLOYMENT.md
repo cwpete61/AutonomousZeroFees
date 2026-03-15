@@ -12,7 +12,7 @@
 ```bash
 # Clone the repository
 git clone <repo-url>
-cd AutonomousWebSales
+cd AutonomousZeroFees
 
 # Setup Production Environment
 cp .env.prod.example .env.prod

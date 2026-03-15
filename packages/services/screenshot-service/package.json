@@ -1,20 +1,20 @@
 {
-    "version":  "0.1.0",
-    "name":  "@agency/screenshot-service",
-    "main":  "dist/index.js",
-    "scripts":  {
-                    "typecheck":  "tsc --noEmit",
-                    "clean":  "rm -rf dist",
-                    "build":  "tsc",
-                    "dev":  "tsc --watch"
-                },
-    "types":  "dist/index.d.ts",
+    "version": "0.1.0",
+    "name": "@agency/screenshot-service",
+    "main": "dist/index.js",
+    "scripts": {
+        "typecheck": "tsc --noEmit",
+        "clean": "rm -rf dist",
+        "build": "tsc",
+        "dev": "tsc --watch"
+    },
+    "types": "dist/index.d.ts",
     "private": true,
     "dependencies": {
-        "playwright": "^1.50.0"
+        "playwright": "^1.58.2"
     },
     "devDependencies": {
-        "typescript": "^5.4.0",
-        "@types/node": "^20.0.0"
+        "@types/node": "^20.19.37",
+        "typescript": "^5.9.3"
     }
 }

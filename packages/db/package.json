@@ -16,14 +16,14 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@prisma/client": "^6.4.1"
+    "@prisma/client": "^6.19.2"
   },
   "devDependencies": {
-    "@nestjs/common": "^11.0.10",
-    "@nestjs/core": "^11.0.10",
-    "prisma": "^6.4.1",
-    "typescript": "^5.5.0",
-    "ts-node": "^10.9.0",
-    "@types/node": "^20.14.0"
+    "@nestjs/common": "^11.1.16",
+    "@nestjs/core": "^11.1.16",
+    "@types/node": "^20.19.37",
+    "prisma": "^6.19.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
   }
 }
