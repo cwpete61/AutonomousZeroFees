@@ -518,7 +518,7 @@ const LoginView = ({ onLogin }) => {
 };
 
 export default function Dashboard() {
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:40000';
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:40001';
   const [activeView, setActiveView] = useState('pipeline');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);

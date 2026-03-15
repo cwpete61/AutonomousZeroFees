@@ -1,5 +1,6 @@
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:40000";
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:40001";
+console.log('[Dashboard] Using API_BASE_URL:', API_BASE_URL);
 const DEFAULT_EMAIL =
   process.env.NEXT_PUBLIC_DEFAULT_EMAIL || "owner@agency.com";
 const DEFAULT_PASSWORD =
