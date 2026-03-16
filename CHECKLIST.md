@@ -1,4 +1,4 @@
-# Orbis Outreach — Production Readiness Master Checklist
+# Orbis Outreach - BPS — Production Readiness Master Checklist
 
 > **Current Status: ~100% Production Ready**
 > Last updated: 2026-03-08
@@ -358,7 +358,7 @@ curl -X POST http://localhost:40000/campaigns \
 # 4. AI email generation
 curl -X POST http://localhost:40000/ai/generate-emails \
   -H "Content-Type: application/json" \
-  -d '{"industry":"HVAC","pain_point_signal":"outdated website","primary_outcome":"more leads","sender_name":"Alex","sender_company":"Orbis Outreach","step_count":3}'
+  -d '{"industry":"HVAC","pain_point_signal":"outdated website","primary_outcome":"more leads","sender_name":"Alex","sender_company":"Orbis Outreach - BPS","step_count":3}'
 
 # 5. List campaigns
 curl http://localhost:40000/campaigns \

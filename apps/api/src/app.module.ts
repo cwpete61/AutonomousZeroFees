@@ -25,6 +25,7 @@ import { EventsModule } from '@agency/events';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { AuditInterceptor } from './common/interceptors/audit.interceptor';
 import { secretsLoader } from '@agency/utils';
+import { MlmModule } from './modules/mlm/mlm.module';
 
 @Module({
   imports: [
@@ -74,6 +75,7 @@ import { secretsLoader } from '@agency/utils';
     DiagnosticsModule,
     SettingsModule,
     EventsModule,
+    MlmModule,
     // OutreachModule,
     // NotificationsModule,
   ],

@@ -25,6 +25,8 @@ async function bootstrap() {
     'http://localhost:3000',
     'http://localhost:30000',
     'http://localhost:30001',
+    'http://localhost:20000',
+    'http://localhost:20001',
   ].filter((o): o is string => !!o);
 
   app.enableCors({

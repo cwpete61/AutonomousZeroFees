@@ -1,6 +1,6 @@
 /**
  * INSTANTLY INTEGRATION
- * Connects Orbis Outreach to Instantly.ai for cold email delivery
+ * Connects Orbis Outreach - BPS to Instantly.ai for cold email delivery
  *
  * FLOW:
  *   1. Outreach Agent composes emails in-app (subject, body, follow-ups)

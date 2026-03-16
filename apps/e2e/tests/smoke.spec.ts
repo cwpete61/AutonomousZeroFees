@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 test.describe('Dashboard Smoke Tests', () => {
   test('should load the dashboard homepage', async ({ page }) => {
     await page.goto('/');
-    await expect(page.locator('text=Orbis Outreach')).toBeVisible({ timeout: 15000 });
+    await expect(page.locator('text=Orbis Outreach - BPS')).toBeVisible({ timeout: 15000 });
   });
 
   test('should display the main navigation', async ({ page }) => {
@@ -28,7 +28,7 @@ test.describe('Dashboard Smoke Tests', () => {
     const themeBtn = page.locator('header button').last();
     await expect(themeBtn).toBeVisible({ timeout: 10000 });
     await themeBtn.click();
-    await expect(page.locator('text=Orbis Outreach')).toBeVisible();
+    await expect(page.locator('text=Orbis Outreach - BPS')).toBeVisible();
   });
 
   test('should navigate to all main views', async ({ page }) => {
@@ -39,6 +39,6 @@ test.describe('Dashboard Smoke Tests', () => {
       await page.waitForTimeout(300);
     }
     // Just verify no crashes during navigation
-    await expect(page.locator('text=Orbis Outreach')).toBeVisible();
+    await expect(page.locator('text=Orbis Outreach - BPS')).toBeVisible();
   });
 });

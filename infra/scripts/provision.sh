@@ -1,11 +1,11 @@
 #!/bin/bash
 
-# Orbis Outreach — Production Provisioning Script
+# Orbis Outreach - BPS — Production Provisioning Script
 # This script installs Docker, Docker Compose, and basic security on Ubuntu 22.04+
 
 set -e
 
-echo "--- Starting Provisioning for Orbis Outreach ---"
+echo "--- Starting Provisioning for Orbis Outreach - BPS ---"
 
 # 1. Update system
 sudo apt-get update

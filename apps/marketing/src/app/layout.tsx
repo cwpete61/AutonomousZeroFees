@@ -9,11 +9,11 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: "Orbis Outreach — Autonomous Lead Generation",
+  title: "Orbis Outreach - BPS — Autonomous Lead Generation",
   description:
     "AI-powered lead discovery, outreach, and web design fulfillment. Find businesses with bad websites, close deals, and deliver sites — all on autopilot.",
   openGraph: {
-    title: "Orbis Outreach — Autonomous Lead Generation",
+    title: "Orbis Outreach - BPS — Autonomous Lead Generation",
     description:
       "AI-powered lead discovery, outreach, and web design fulfillment. Zero manual work.",
     type: "website",

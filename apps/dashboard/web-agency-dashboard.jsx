@@ -640,7 +640,7 @@ export default function Dashboard() {
     primary_outcome: '',
     secondary_outcome: '',
     sender_name: '',
-    sender_company: 'Orbis Outreach',
+    sender_company: 'Orbis Outreach - BPS',
   });
 
   useEffect(() => {
@@ -1542,7 +1542,7 @@ export default function Dashboard() {
       <header style={{ padding: 'clamp(14px, 1.5vw, 22px) clamp(20px, 2.5vw, 36px)', borderBottom: `1px solid ${t.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: t.headerBg, backdropFilter: 'blur(12px)', position: 'sticky', top: 0, zIndex: 100 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
           <div style={{ width: 'clamp(32px, 3vw, 42px)', height: 'clamp(32px, 3vw, 42px)', background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 'clamp(0.9rem, 1.2vw, 1.2rem)' }}>◉</div>
-          <span style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 'clamp(1.1rem, 1.5vw, 1.5rem)' }}>Orbis Outreach</span>
+          <span style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 'clamp(1.1rem, 1.5vw, 1.5rem)' }}>Orbis Outreach - BPS</span>
         </div>
         <div style={{ display: 'flex', gap: 'clamp(2px, 0.4vw, 8px)', alignItems: 'center', flexWrap: 'wrap' }}>
           {['campaigns', 'emailcampaigns', 'jobqueue', 'agents', 'pipeline', 'crm', 'analytics', 'api', 'users', 'system'].map(view => (
@@ -2103,7 +2103,7 @@ export default function Dashboard() {
                         </button>
                         {aiPanelOpen && (
                           <div style={{ padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: '10px', borderTop: `1px solid ${t.borderSubtle}` }}>
-                            {[['industry', 'Industry', 'e.g. HVAC, Dental, Roofing'], ['pain_point_signal', 'Pain Point', 'e.g. poor website visibility'], ['primary_outcome', 'Primary Outcome', 'e.g. more leads from Google'], ['secondary_outcome', 'Secondary Outcome (opt.)', 'e.g. save on marketing costs'], ['sender_name', 'Your Name', 'e.g. Alex Smith'], ['sender_company', 'Company', 'Orbis Outreach']].map(([field, label, placeholder]) => (
+                            {[['industry', 'Industry', 'e.g. HVAC, Dental, Roofing'], ['pain_point_signal', 'Pain Point', 'e.g. poor website visibility'], ['primary_outcome', 'Primary Outcome', 'e.g. more leads from Google'], ['secondary_outcome', 'Secondary Outcome (opt.)', 'e.g. save on marketing costs'], ['sender_name', 'Your Name', 'e.g. Alex Smith'], ['sender_company', 'Company', 'Orbis Outreach - BPS']].map(([field, label, placeholder]) => (
                               <div key={field}>
                                 <label style={{ fontSize: '0.68rem', fontWeight: 600, color: t.textMuted, display: 'block', marginBottom: '3px' }}>{label}</label>
                                 <input

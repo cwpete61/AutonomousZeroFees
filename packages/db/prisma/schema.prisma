@@ -306,6 +306,10 @@ enum NotificationChannel {
   SLACK
 }
 
+enum AppointmentStatus {
+  REQUESTED
+}
+
 // ─── AUTH & USERS ───────────────────────────────────────────────────
 
 model User {
@@ -768,4 +772,50 @@ model SystemSetting {
   key       String   @unique
   value     String
   updatedAt DateTime @updatedAt
+}
+
+// ─── MERCHANT LEAD MONSTER ─────────────────────────────────────
+
+model CalculatorSession {
+  id                      String   @id @default(cuid())
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+  monthlyVolumeCents      BigInt
+  currentRateBps          Int
+  targetRateBps           Int
+  monthlyFeesCurrentCents BigInt
+  monthlyFeesTargetCents  BigInt
+  monthlySavingsCents     BigInt
+  annualSavingsCents      BigInt
+  utmSource               String?
+  utmMedium               String?
+  utmCampaign             String?
+  utmTerm                 String?
+  utmContent              String?
+  referrer                String?
+  merchantId              String?
+
+  appointments            Appointment[]
+
+  @@index([createdAt])
+}
+
+model Appointment {
+  id                   String            @id @default(cuid())
+  createdAt            DateTime          @default(now())
+  updatedAt            DateTime          @updatedAt
+  calculatorSessionId  String
+  status               AppointmentStatus @default(REQUESTED)
+  name                 String
+  email                String
+  phone                String?
+  businessName         String
+  preferredTimeWindow  String?
+  notes                String?
+
+  calculatorSession    CalculatorSession @relation(fields: [calculatorSessionId], references: [id], onDelete: Cascade)
+
+  @@index([createdAt])
+  @@index([email])
+  @@index([calculatorSessionId])
 }

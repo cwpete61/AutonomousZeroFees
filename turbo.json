@@ -18,7 +18,10 @@
     "NEXT_PUBLIC_DEFAULT_EMAIL",
     "NEXT_PUBLIC_DEFAULT_PASSWORD",
     "DASHBOARD_URL",
-    "API_PORT"
+    "API_PORT",
+    "MLM_ENABLED",
+    "NEXT_PUBLIC_MLM_ENABLED",
+    "MLM_TARGET_RATE_PCT"
   ],
   "tasks": {
     "build": {

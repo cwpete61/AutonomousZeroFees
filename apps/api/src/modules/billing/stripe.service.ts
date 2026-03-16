@@ -28,7 +28,7 @@ export class StripeService {
                     price_data: {
                         currency,
                         product_data: {
-                            name: `Orbis Outreach — ${packageName}`,
+                            name: `Orbis Outreach - BPS — ${packageName}`,
                             description: `Web Design & SEO Services for Lead ${leadId}`,
                         },
                         unit_amount: Math.round(amount * 100), // cents

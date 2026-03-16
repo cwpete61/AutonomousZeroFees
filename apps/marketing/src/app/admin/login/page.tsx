@@ -67,7 +67,7 @@ export default function AdminLogin() {
           >
             ◉
           </div>
-          Orbis Outreach
+          Orbis Outreach - BPS
         </div>
         <p className="login-subtitle">Sign in to the admin dashboard</p>
 
@@ -133,7 +133,7 @@ export default function AdminLogin() {
         </form>
 
         <Link href="/" className="login-back">
-          ← Back to Orbis Outreach
+          ← Back to Orbis Outreach - BPS
         </Link>
       </div>
     </div>

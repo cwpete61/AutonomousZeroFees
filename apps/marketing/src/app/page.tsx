@@ -13,7 +13,7 @@ export default function Home() {
         <div className="nav-inner">
           <Link href="/" className="nav-logo">
             <div className="nav-logo-icon">◉</div>
-            Orbis Outreach
+            Orbis Outreach - BPS
           </Link>
           <ul className="nav-links">
             <li>
@@ -57,7 +57,7 @@ export default function Home() {
             </span>
           </h1>
           <p className="hero-sub">
-            Orbis Outreach finds businesses with bad websites, sends
+            Orbis Outreach - BPS finds businesses with bad websites, sends
             personalized outreach, closes deals, and builds sites — all while
             you sleep.
           </p>
@@ -319,7 +319,7 @@ export default function Home() {
           <div className="cta-content">
             <h2>Ready to Put Your Outreach on Autopilot?</h2>
             <p>
-              We build and deploy custom Orbis Outreach systems for agencies. By
+              We build and deploy custom Orbis Outreach - BPS systems for agencies. By
               appointment only.
             </p>
             <a href="mailto:hello@orbisoutreach.com" className="btn-primary">
@@ -334,7 +334,7 @@ export default function Home() {
         <div className="container">
           <div className="footer-inner">
             <div className="footer-brand">
-              © 2026 Orbis Outreach. All rights reserved.
+              © 2026 Orbis Outreach - BPS. All rights reserved.
             </div>
             <ul className="footer-links">
               <li>
@@ -619,7 +619,7 @@ const PRICING = [
 
 const FAQS = [
   {
-    q: "How does Orbis Outreach find leads?",
+    q: "How does Orbis Outreach - BPS find leads?",
     a: "Our Scout Agent searches Google Places for service businesses in your target industries and locations, then scores their websites using PageSpeed Insights and AI analysis. Only businesses with genuinely poor websites are flagged as qualified leads.",
   },
   {
@@ -636,7 +636,7 @@ const FAQS = [
   },
   {
     q: "Can I use my own domain for sending emails?",
-    a: "Yes. Orbis Outreach integrates with Resend or SendGrid using your own verified domain. We recommend warming up new domains before scaling.",
+    a: "Yes. Orbis Outreach - BPS integrates with Resend or SendGrid using your own verified domain. We recommend warming up new domains before scaling.",
   },
   {
     q: "What kind of websites does the Build Agent create?",
