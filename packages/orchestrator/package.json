@@ -1,18 +1,21 @@
 {
-    "version": "0.1.0",
-    "name": "@agency/orchestrator",
-    "main": "dist/index.js",
-    "scripts": {
-        "typecheck": "tsc --noEmit",
-        "clean": "rm -rf dist",
-        "build": "tsc",
-        "dev": "tsc --watch"
-    },
-    "types": "dist/index.d.ts",
-    "private": true,
-    "devDependencies": {
-        "@nestjs/common": "^11.1.16",
-        "@prisma/client": "^6.19.2",
-        "@types/node": "^20.19.37"
-    }
+  "version": "0.1.0",
+  "name": "@agency/orchestrator",
+  "main": "dist/index.js",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist",
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
+  "types": "dist/index.d.ts",
+  "private": true,
+  "dependencies": {
+    "@agency/db": "workspace:*"
+  },
+  "devDependencies": {
+    "@nestjs/common": "^11.1.16",
+    "@prisma/client": "^6.19.2",
+    "@types/node": "^20.19.37"
+  }
 }

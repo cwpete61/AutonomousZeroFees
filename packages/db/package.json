@@ -6,6 +6,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "prisma generate && tsc",
+    "postinstall": "prisma generate",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
@@ -13,7 +14,7 @@
     "db:seed": "ts-node prisma/seeds/index.ts",
     "db:studio": "prisma studio",
     "db:reset": "prisma migrate reset",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "prisma generate && tsc --noEmit"
   },
   "dependencies": {
     "@prisma/client": "^6.19.2"
