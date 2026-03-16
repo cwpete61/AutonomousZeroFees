@@ -31,8 +31,8 @@ packages/db/generated/
 logs/
 
 # Backups
-backups/
-tmp/
+/backups/
+/tmp/
 
 # Temp Content Files
 content.md
@@ -40,11 +40,11 @@ email.md
 marketing-content.md
 
 # Backups (keep the structure, ignore data)
-backups/db/*.sql
-backups/db/*.dump
-backups/uploads/*
-backups/config/*.bak
-!backups/**/.gitkeep
+/backups/db/*.sql
+/backups/db/*.dump
+/backups/uploads/*
+/backups/config/*.bak
+!/backups/**/.gitkeep
 
 # Docker
 docker-compose.override.yml

@@ -224,6 +224,12 @@ enum IncidentStatus {
   CLOSED
 }
 
+// ─── MERCHANT LEAD MONSTER (SLICE 1) ─────────────────────────────
+
+enum MerchantLeadMonsterAppointmentStatus {
+  REQUESTED
+}
+
 enum MaintenanceTaskType {
   QUEUE_RETRY_SWEEP
   DEAD_LETTER_REVIEW
@@ -485,6 +491,61 @@ model Conversation {
 
   lead   Lead?   @relation(fields: [leadId], references: [id], onDelete: SetNull)
   client Client? @relation(fields: [clientId], references: [id], onDelete: SetNull)
+}
+
+// ─── MERCHANT LEAD MONSTER (SLICE 1) ─────────────────────────────
+
+model MerchantLeadMonsterCalculatorSession {
+  id String @id @default(cuid())
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  monthlyVolumeCents      BigInt @db.BigInt
+  currentRateBps          Int
+  targetRateBps           Int
+  monthlyFeesCurrentCents BigInt @db.BigInt
+  monthlyFeesTargetCents  BigInt @db.BigInt
+  monthlySavingsCents     BigInt @db.BigInt
+  annualSavingsCents      BigInt @db.BigInt
+
+  utmSource   String? @db.VarChar(200)
+  utmMedium   String? @db.VarChar(200)
+  utmCampaign String? @db.VarChar(200)
+  utmTerm     String? @db.VarChar(200)
+  utmContent  String? @db.VarChar(200)
+  referrer    String? @db.VarChar(500)
+
+  // reserved for later slices
+  merchantId String? @db.VarChar(64)
+
+  appointments MerchantLeadMonsterAppointment[]
+
+  @@index([createdAt])
+  @@index([utmCampaign])
+}
+
+model MerchantLeadMonsterAppointment {
+  id String @id @default(cuid())
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  calculatorSessionId String
+  status              MerchantLeadMonsterAppointmentStatus
+
+  name                String  @db.VarChar(120)
+  email               String  @db.VarChar(254)
+  phone               String? @db.VarChar(32)
+  businessName        String  @db.VarChar(160)
+  preferredTimeWindow String? @db.VarChar(120)
+  notes               String? @db.VarChar(2000)
+
+  calculatorSession MerchantLeadMonsterCalculatorSession @relation(fields: [calculatorSessionId], references: [id], onDelete: Cascade)
+
+  @@index([createdAt])
+  @@index([email])
+  @@index([calculatorSessionId])
 }
 
 // ─── SALES & BILLING ────────────────────────────────────────────────
