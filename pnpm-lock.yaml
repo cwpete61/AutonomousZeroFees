@@ -451,6 +451,10 @@ importers:
   packages/logger: {}
 
   packages/orchestrator:
+    dependencies:
+      '@agency/db':
+        specifier: workspace:*
+        version: link:../db
     devDependencies:
       '@nestjs/common':
         specifier: ^11.1.16
