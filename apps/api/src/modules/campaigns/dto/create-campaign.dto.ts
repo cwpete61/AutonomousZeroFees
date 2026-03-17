@@ -29,4 +29,9 @@ export class CreateCampaignDto {
     @IsOptional()
     @IsEnum(CampaignStatus)
     status?: CampaignStatus;
+
+    @ApiPropertyOptional({ description: 'Optional email sequence ID' })
+    @IsOptional()
+    @IsString()
+    emailSequenceId?: string;
 }

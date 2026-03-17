@@ -573,7 +573,8 @@ export default function Dashboard() {
     services: [],
     geography: { state: null, county: null, city: null },
     isScheduled: false,
-    scheduledDate: ''
+    scheduledDate: '',
+    autoWriteEmail: false
   });
   const [isWizard, setIsWizard] = useState(true);
   const [selectedLeadId, setSelectedLeadId] = useState(null);
@@ -945,8 +946,39 @@ export default function Dashboard() {
     if (!newCampaign?.name) return;
 
     const campaignStatus = newCampaign.isScheduled ? 'PAUSED' : 'ACTIVE';
+    
+    let emailSequenceId = null;
 
     try {
+      if (!editingCampaignId && newCampaign.autoWriteEmail) {
+        setAiGenerating(true);
+        // Auto-generate outreach sequence
+        const autoAiInputs = {
+          industry: newCampaign.industry?.label || 'General',
+          pain_point_signal: `poor performance in ${newCampaign.industry?.label || 'their sector'}`,
+          primary_outcome: `increased revenue and lead volume`,
+          sender_name: user?.fullName || user?.username || 'Alex',
+          sender_company: 'Orbis Outreach - BPS',
+          step_count: 3
+        };
+
+        const aiData = await aiApi.generateEmails(autoAiInputs);
+        const seqData = await emailSequencesApi.create({
+          name: `Auto-Generated: ${newCampaign.name}`,
+          emails: [1, 2, 3].map(i => {
+            const emailKey = `email_${i}`;
+            const email = aiData[emailKey];
+            return {
+              stepNumber: i,
+              delayDays: i === 1 ? 0 : (i === 2 ? 3 : 7),
+              subject: email?.subject || 'Quick question',
+              body: email?.body || 'Hi there, just reaching out...'
+            };
+          })
+        });
+        emailSequenceId = seqData.id;
+      }
+
       if (editingCampaignId) {
         await campaignsApi.update(editingCampaignId, {
           name: newCampaign.name,
@@ -965,9 +997,11 @@ export default function Dashboard() {
             services: newCampaign.services,
             industry: newCampaign.industry,
             geography: newCampaign.geography,
+            autoWriteEmail: newCampaign.autoWriteEmail
           },
           thresholds: { targetCount: newCampaign.targetCount },
           status: campaignStatus,
+          emailSequenceId
         });
       }
 
@@ -977,6 +1011,8 @@ export default function Dashboard() {
     } catch (err) {
       console.error("Failed to save campaign:", err);
       alert("Failed to save campaign. See console.");
+    } finally {
+      setAiGenerating(false);
     }
 
     setIsCampaignModalOpen(false);
@@ -991,7 +1027,8 @@ export default function Dashboard() {
       services: [],
       geography: { state: null, county: null, city: null },
       isScheduled: false,
-      scheduledDate: ''
+      scheduledDate: '',
+      autoWriteEmail: false
     });
     setIsWizard(true);
   };
@@ -3432,19 +3469,44 @@ export default function Dashboard() {
                         )}
 
                         {(isWizard ? modalStep === 4 : true) && (
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                            {!isWizard && <div style={{ fontSize: '0.85rem', fontWeight: 800, color: '#6366f1' }}>STEP 4: SCHEDULING</div>}
-                            <div style={{ padding: '20px', background: t.bg, borderRadius: '16px', border: `1px solid ${t.borderSubtle}` }}>
-                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                                <div style={{ fontWeight: 600 }}>Schedule for later?</div>
-                                <div onClick={() => setNewCampaign({ ...newCampaign, isScheduled: !newCampaign.isScheduled })} style={{ width: 44, height: 24, background: newCampaign.isScheduled ? '#22c55e' : t.barBg, borderRadius: 12, cursor: 'pointer', position: 'relative', transition: '0.2s' }}>
-                                  <div style={{ width: 18, height: 18, background: '#fff', borderRadius: '50%', position: 'absolute', top: 3, left: newCampaign.isScheduled ? 23 : 3, transition: '0.2s' }} />
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                            {!isWizard && <div style={{ fontSize: '0.85rem', fontWeight: 800, color: '#6366f1' }}>STEP 4: SCHEDULING & AUTOMATION</div>}
+                            
+                            <div style={{ padding: '24px', background: t.bg, borderRadius: '20px', border: `1px solid ${t.borderSubtle}`, display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <div>
+                                  <div style={{ fontWeight: 700, fontSize: '0.9rem', color: t.text }}>AutoWriteEmail™ Outreach</div>
+                                  <div style={{ fontSize: '0.75rem', color: t.textMuted, marginTop: '2px' }}>Automatically craft hyper-personalized emails for this campaign.</div>
+                                </div>
+                                <div onClick={() => setNewCampaign({ ...newCampaign, autoWriteEmail: !newCampaign.autoWriteEmail })} style={{ width: 50, height: 26, background: newCampaign.autoWriteEmail ? 'linear-gradient(135deg, #6366f1, #8b5cf6)' : t.barBg, borderRadius: 13, cursor: 'pointer', position: 'relative', transition: '0.3s', boxShadow: newCampaign.autoWriteEmail ? '0 0 15px rgba(99,102,241,0.3)' : 'none' }}>
+                                  <div style={{ width: 20, height: 20, background: '#fff', borderRadius: '50%', position: 'absolute', top: 3, left: newCampaign.autoWriteEmail ? 27 : 3, transition: '0.3s', boxShadow: '0 2px 4px rgba(0,0,0,0.2)' }} />
+                                </div>
+                              </div>
+                              
+                              {newCampaign.autoWriteEmail && (
+                                <div style={{ padding: '12px 16px', background: 'rgba(99,102,241,0.05)', borderRadius: '12px', border: '1px dashed rgba(99,102,241,0.3)', display: 'flex', gap: '12px', alignItems: 'center' }}>
+                                  <span style={{ fontSize: '1.2rem' }}>✨</span>
+                                  <span style={{ fontSize: '0.75rem', color: '#818cf8', fontWeight: 500 }}>
+                                    AI will generate a 3-step outreach sequence based on the <b>{newCampaign.industry?.label || 'selected industry'}</b>.
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+
+                            <div style={{ padding: '24px', background: t.bg, borderRadius: '20px', border: `1px solid ${t.borderSubtle}`, display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <div>
+                                  <div style={{ fontWeight: 700, fontSize: '0.9rem', color: t.text }}>Schedule for later?</div>
+                                  <div style={{ fontSize: '0.75rem', color: t.textMuted, marginTop: '2px' }}>Set a specific time for the system to launch.</div>
+                                </div>
+                                <div onClick={() => setNewCampaign({ ...newCampaign, isScheduled: !newCampaign.isScheduled })} style={{ width: 50, height: 26, background: newCampaign.isScheduled ? '#22c55e' : t.barBg, borderRadius: 13, cursor: 'pointer', position: 'relative', transition: '0.3s' }}>
+                                  <div style={{ width: 20, height: 20, background: '#fff', borderRadius: '50%', position: 'absolute', top: 3, left: newCampaign.isScheduled ? 27 : 3, transition: '0.3s' }} />
                                 </div>
                               </div>
                               {newCampaign.isScheduled && (
-                                <div style={{ marginTop: '20px' }}>
-                                  <label style={{ display: 'block', fontSize: '0.75rem', color: t.textMuted, marginBottom: '8px', fontWeight: 600 }}>LAUNCH DATE & TIME</label>
-                                  <input type="datetime-local" value={newCampaign.scheduledDate} onChange={e => setNewCampaign({ ...newCampaign, scheduledDate: e.target.value })} style={{ width: '100%', padding: '12px', background: t.card, border: `1px solid ${t.borderSubtle}`, borderRadius: '10px', color: t.text, outline: 'none' }} />
+                                <div style={{ marginTop: '4px' }}>
+                                  <label style={{ display: 'block', fontSize: '0.7rem', color: t.textMuted, marginBottom: '8px', fontWeight: 700, textTransform: 'uppercase' }}>LAUNCH DATE & TIME</label>
+                                  <input type="datetime-local" value={newCampaign.scheduledDate} onChange={e => setNewCampaign({ ...newCampaign, scheduledDate: e.target.value })} style={{ width: '100%', padding: '14px', background: t.card, border: `1px solid ${t.borderSubtle}`, borderRadius: '12px', color: t.text, outline: 'none' }} />
                                 </div>
                               )}
                             </div>
@@ -3489,25 +3551,27 @@ export default function Dashboard() {
                       Next
                     </button>
                   ) : (
-                    <button
-                      onClick={addCampaign}
-                      disabled={
-                        !newCampaign.name ||
-                        !newCampaign.industry ||
-                        !newCampaign.geography?.state ||
-                        (newCampaign.isScheduled && !newCampaign.scheduledDate)
-                      }
-                      style={{
-                        flex: 2, padding: '14px', background: '#22c55e', color: '#fff', borderRadius: '12px', border: 'none', cursor: 'pointer', fontWeight: 700, opacity: (
+                      <button
+                        onClick={addCampaign}
+                        disabled={
+                          aiGenerating ||
                           !newCampaign.name ||
                           !newCampaign.industry ||
                           !newCampaign.geography?.state ||
                           (newCampaign.isScheduled && !newCampaign.scheduledDate)
-                        ) ? 0.5 : 1
-                      }}
-                    >
-                      {editingCampaignId ? 'Update Campaign' : 'Create Campaign'}
-                    </button>
+                        }
+                        style={{
+                          flex: 2, padding: '14px', background: aiGenerating ? '#8b5cf6' : '#22c55e', color: '#fff', borderRadius: '12px', border: 'none', cursor: 'pointer', fontWeight: 700, transition: '0.3s', transform: aiGenerating ? 'scale(0.98)' : 'scale(1)', opacity: (
+                            aiGenerating ||
+                            !newCampaign.name ||
+                            !newCampaign.industry ||
+                            !newCampaign.geography?.state ||
+                            (newCampaign.isScheduled && !newCampaign.scheduledDate)
+                          ) ? 0.5 : 1
+                        }}
+                      >
+                        {aiGenerating ? '🪄 Generating Sequence...' : (editingCampaignId ? 'Update Campaign' : 'Create Campaign')}
+                      </button>
                   )}
                 </div>
               </div>
@@ -3550,6 +3614,18 @@ export default function Dashboard() {
 
                       <div style={{ height: '1px', background: t.borderSubtle }} />
 
+                      <div style={{ height: '1px', background: t.borderSubtle }} />
+
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                        <span style={{ fontSize: '0.7rem', color: t.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Automation</span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: newCampaign.autoWriteEmail ? '#8b5cf6' : t.textMuted }}>
+                          <span style={{ fontSize: '1rem' }}>{newCampaign.autoWriteEmail ? '✨' : '⚪'}</span>
+                          <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>{newCampaign.autoWriteEmail ? 'AutoWrite Outreach' : 'Manual Outreach'}</span>
+                        </div>
+                      </div>
+
+                      <div style={{ height: '1px', background: t.borderSubtle }} />
+
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                         <span style={{ fontSize: '0.7rem', color: t.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Launch</span>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: newCampaign.isScheduled ? '#f59e0b' : '#22c55e' }}>
@@ -3559,6 +3635,13 @@ export default function Dashboard() {
                       </div>
                     </div>
                   </div>
+
+                  {newCampaign.autoWriteEmail && (
+                    <div style={{ padding: '16px', background: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.2)', borderRadius: '12px', fontSize: '0.75rem', color: '#818cf8', display: 'flex', gap: '10px' }}>
+                      <span>🪄</span>
+                      <span>AI will write personalized outreach sequences for every discovered lead in this campaign.</span>
+                    </div>
+                  )}
 
                   {!newCampaign.industry && (
                     <div style={{ padding: '16px', background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.2)', borderRadius: '12px', fontSize: '0.75rem', color: '#f59e0b', display: 'flex', gap: '10px' }}>

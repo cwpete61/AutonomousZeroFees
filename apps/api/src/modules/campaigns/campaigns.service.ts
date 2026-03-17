@@ -25,6 +25,7 @@ export class CampaignsService {
                 sourceConfig: (dto.sourceConfig ?? {}) as object,
                 thresholds: (dto.thresholds ?? {}) as object,
                 status: dto.status ?? CampaignStatus.ACTIVE,
+                emailSequenceId: dto.emailSequenceId,
             },
         });
     }
