@@ -17,74 +17,11 @@ const PIPELINE_STAGES = [
   { id: 'delivered', label: 'Delivered', color: '#10b981' },
 ];
 
-const SAMPLE_LEADS = [
-  { id: 10, name: 'Main St Dental', industry: 'Dentistry', city: 'Miami, FL', score: 15, stage: 'lead_inbox', website: 'mainstdental.com' },
-  { id: 11, name: 'Golden Gate Auto', industry: 'Auto Repair', city: 'San Francisco, CA', score: 22, stage: 'lead_inbox', website: 'ggauto.com' },
-  { id: 1, name: 'Pro Plumbing Co', industry: 'Plumbing', city: 'Austin, TX', score: 32, stage: 'discovered', website: 'proplumbing.com' },
-  { id: 2, name: 'Elite HVAC Services', industry: 'HVAC', city: 'Dallas, TX', score: 45, stage: 'discovered', website: 'elitehvac.net' },
-  { id: 3, name: 'Sunrise Landscaping', industry: 'Landscaping', city: 'Phoenix, AZ', score: 28, stage: 'discovered', website: 'sunriselandscape.com' },
-  { id: 4, name: 'Best Roofing LLC', industry: 'Roofing', city: 'Denver, CO', score: 38, stage: 'outreach_sent', website: 'bestroofingco.com' },
-  { id: 5, name: 'Apex Electric', industry: 'Electrical', city: 'Miami, FL', score: 41, stage: 'outreach_sent', website: 'apexelectric.net' },
-  { id: 6, name: 'Green Landscaping', industry: 'Landscaping', city: 'Portland, OR', score: 52, stage: 'replied', website: 'greenlandscaping.com' },
-  { id: 7, name: 'Diamond Cleaning', industry: 'Cleaning', city: 'Seattle, WA', score: 67, stage: 'demo_sent', website: 'diamondclean.com' },
-  { id: 8, name: 'Sparkle Cleaning', industry: 'Cleaning', city: 'Chicago, IL', score: 89, stage: 'paid', website: 'sparklecleaning.com' },
-  { id: 9, name: 'Summit Roofing', industry: 'Roofing', city: 'Nashville, TN', score: 78, stage: 'building', website: 'summitroofing.com' },
-];
+const SAMPLE_LEADS = [];
+const INITIAL_AGENTS = [];
+const INITIAL_CRM_CLIENTS = [];
 
-const INITIAL_AGENTS = [
-  { name: 'Scout Agent', status: 'active', lastRun: '2 min ago', processed: 47 },
-  { name: 'Outreach Agent', status: 'active', lastRun: '5 min ago', processed: 23 },
-  { name: 'Design Preview', status: 'idle', lastRun: '1 hr ago', processed: 8 },
-  { name: 'Sales Close', status: 'active', lastRun: '12 min ago', processed: 5 },
-  { name: 'Web Build', status: 'building', lastRun: '30 min ago', processed: 3 },
-  { name: 'Client Success', status: 'idle', lastRun: '2 hr ago', processed: 12 },
-  { name: 'Content Agent', status: 'idle', lastRun: '45 min ago', processed: 15 },
-  { name: 'Error Agent', status: 'monitoring', lastRun: 'always', processed: 0 },
-  { name: 'Code Agent', status: 'idle', lastRun: '1 hr ago', processed: 6 },
-  { name: 'Email Writing Agent', status: 'active', lastRun: 'Now', processed: 0 },
-  { name: 'Onboarding Agent', status: 'active', lastRun: 'Now', processed: 0 },
-  { name: 'Finance Agent', status: 'idle', lastRun: 'Now', processed: 0 },
-  { name: 'SEO Audit Agent', status: 'active', lastRun: 'Now', processed: 0 },
-  { name: 'Nurture Agent', status: 'active', lastRun: 'Now', processed: 0 },
-];
-
-const INITIAL_CRM_CLIENTS = [
-  {
-    id: 'c1', name: 'Sparkle Cleaning', contact: 'Maria Garcia', email: 'maria@sparklecleaning.com', phone: '(312) 555-8821', industry: 'Cleaning', city: 'Chicago, IL', website: 'sparklecleaning.com', score: 89, stage: 'delivered', outreachAt: '2026-02-02', repliedAt: '2026-02-04', paidAt: '2026-02-08', deliveredAt: '2026-02-15', invoiceId: 'INV-1001', amount: 2994, paymentMethod: 'Stripe', paymentStatus: 'paid', pagespeedScore: 45, gtmetrixScore: 52, pingdomScore: 88, engagementScore: 92, emailOpenRate: 88, demoViewTime: 15, replyVelocity: 2, conversionVelocity: 8, churnRisk: 5, readinessFactor: 100, monthlyLeadProjection: 52, roiFactor: 5.8, automationSavings: 34, automation: { scout: true, outreach: true, analysis: true, design: true }, timeline: [
-      { date: '2026-02-01', action: 'Discovered by Scout Agent', type: 'system' }, { date: '2026-02-01', action: 'Auto-qualified: Score 89/100', type: 'system' }, { date: '2026-02-02', action: 'Cold email sent via Resend', type: 'email' }, { date: '2026-02-03', action: 'SMS outreach sent (Twilio)', type: 'sms' }, { date: '2026-02-04', action: 'Maria replied: "Interested, show me more"', type: 'reply' }, { date: '2026-02-05', action: 'Blurred mockup sent via email', type: 'email' }, { date: '2026-02-05', action: 'Maria viewed demo (2m 34s)', type: 'engagement' }, { date: '2026-02-06', action: 'Voice follow-up call (AI script)', type: 'call' }, { date: '2026-02-06', action: 'Proposal generated: $2,994', type: 'system' }, { date: '2026-02-06', action: 'Stripe invoice sent', type: 'payment' }, { date: '2026-02-08', action: 'Payment received: $2,994', type: 'payment' }, { date: '2026-02-09', action: 'Web Build Agent started', type: 'system' }, { date: '2026-02-15', action: 'Website delivered & live', type: 'delivery' }
-    ]
-  },
-  {
-    id: 'c2', name: 'Summit Roofing', contact: 'Jake Williams', email: 'jake@summitroofing.com', phone: '(615) 555-3390', industry: 'Roofing', city: 'Nashville, TN', website: 'summitroofing.com', score: 78, stage: 'building', outreachAt: '2026-02-11', repliedAt: '2026-02-14', paidAt: '2026-02-18', deliveredAt: null, invoiceId: 'INV-1002', amount: 3494, paymentMethod: 'Stripe', paymentStatus: 'paid', pagespeedScore: 82, gtmetrixScore: 76, pingdomScore: 99, engagementScore: 85, emailOpenRate: 75, demoViewTime: 8, replyVelocity: 5, conversionVelocity: 14, churnRisk: 12, readinessFactor: 85, monthlyLeadProjection: 38, roiFactor: 4.2, automationSavings: 18, automation: { scout: true, outreach: true, analysis: true, design: true }, timeline: [
-      { date: '2026-02-10', action: 'Discovered by Scout Agent', type: 'system' }, { date: '2026-02-11', action: 'Email + LinkedIn DM sent', type: 'email' }, { date: '2026-02-14', action: 'Jake replied via LinkedIn', type: 'reply' }, { date: '2026-02-15', action: 'Demo mockup delivered', type: 'system' }, { date: '2026-02-16', action: 'Proposal sent: $3,494', type: 'system' }, { date: '2026-02-18', action: 'Payment received: $3,494', type: 'payment' }, { date: '2026-02-20', action: 'Web Build Agent started', type: 'system' }
-    ]
-  },
-  {
-    id: 'c3', name: 'Diamond Cleaning', contact: 'Lisa Park', email: 'lisa@diamondclean.com', phone: '(206) 555-7712', industry: 'Cleaning', city: 'Seattle, WA', website: 'diamondclean.com', score: 67, stage: 'proposal_sent', outreachAt: '2026-02-19', repliedAt: '2026-02-22', paidAt: null, deliveredAt: null, invoiceId: 'INV-1003', amount: 2494, paymentMethod: null, paymentStatus: 'pending', engagementScore: 65, emailOpenRate: 60, demoViewTime: 5, replyVelocity: 3, conversionVelocity: 18, churnRisk: 25, readinessFactor: 45, monthlyLeadProjection: 28, roiFactor: 3.5, automationSavings: 12, automation: { scout: true, outreach: true, analysis: true, design: true }, timeline: [
-      { date: '2026-02-18', action: 'Discovered by Scout Agent', type: 'system' }, { date: '2026-02-19', action: 'Cold email sent', type: 'email' }, { date: '2026-02-22', action: 'Lisa replied: "What does this cost?"', type: 'reply' }, { date: '2026-02-23', action: 'Mockup + pricing sent', type: 'email' }, { date: '2026-02-25', action: 'Proposal sent: $2,494', type: 'system' }, { date: '2026-02-25', action: 'Stripe invoice sent — awaiting payment', type: 'payment' }
-    ]
-  },
-  {
-    id: 'c4', name: 'Green Landscaping', contact: 'Tom Chen', email: 'tom@greenlandscaping.com', phone: '(503) 555-4488', industry: 'Landscaping', city: 'Portland, OR', website: 'greenlandscaping.com', score: 52, stage: 'replied', outreachAt: '2026-02-26', repliedAt: '2026-03-01', paidAt: null, deliveredAt: null, invoiceId: null, amount: null, paymentMethod: null, paymentStatus: null, engagementScore: 45, emailOpenRate: 40, demoViewTime: 2, replyVelocity: 4, conversionVelocity: 25, churnRisk: 40, readinessFactor: 20, monthlyLeadProjection: 15, roiFactor: 1.8, automationSavings: 5, automation: { scout: true, outreach: true, analysis: true, design: true }, timeline: [
-      { date: '2026-02-25', action: 'Discovered by Scout Agent', type: 'system' }, { date: '2026-02-26', action: 'Email + Facebook DM sent', type: 'email' }, { date: '2026-03-01', action: 'Tom replied: "Send me info"', type: 'reply' }
-    ]
-  },
-  {
-    id: 'c5', name: 'Best Roofing LLC', contact: 'Dan Miller', email: 'dan@bestroofingco.com', phone: '(720) 555-1199', industry: 'Roofing', city: 'Denver, CO', website: 'bestroofingco.com', score: 38, stage: 'outreach_sent', outreachAt: '2026-03-02', repliedAt: null, paidAt: null, deliveredAt: null, invoiceId: null, amount: null, paymentMethod: null, paymentStatus: null, engagementScore: 20, emailOpenRate: 15, demoViewTime: 0, replyVelocity: 0, conversionVelocity: 30, churnRisk: 70, readinessFactor: 5, monthlyLeadProjection: 10, roiFactor: 1.2, automationSavings: 2, automation: { scout: true, outreach: true, analysis: true, design: true }, timeline: [
-      { date: '2026-03-01', action: 'Discovered by Scout Agent', type: 'system' }, { date: '2026-03-02', action: 'Cold email sent', type: 'email' }, { date: '2026-03-04', action: 'Follow-up #1 sent', type: 'email' }
-    ]
-  },
-  {
-    id: 'c6', name: 'Apex Electric', contact: 'Rosa Diaz', email: 'rosa@apexelectric.net', phone: '(305) 555-6644', industry: 'Electrical', city: 'Miami, FL', website: 'apexelectric.net', score: 41, stage: 'outreach_sent', outreachAt: '2026-03-03', repliedAt: null, paidAt: null, deliveredAt: null, invoiceId: null, amount: null, paymentMethod: null, paymentStatus: null, engagementScore: 18, emailOpenRate: 12, demoViewTime: 0, replyVelocity: 0, conversionVelocity: 32, churnRisk: 75, readinessFactor: 2, monthlyLeadProjection: 8, roiFactor: 1.1, automationSavings: 1, automation: { scout: true, outreach: true, analysis: true, design: true }, timeline: [
-      { date: '2026-03-02', action: 'Discovered by Scout Agent', type: 'system' }, { date: '2026-03-03', action: 'Email + Instagram DM sent', type: 'email' }
-    ]
-  },
-];
-
-const INITIAL_CAMPAIGNS = [
-  { id: 'cp1', name: 'Miami Dental Outreach', niche: 'Medical', services: ['Dentistry'], geography: { state: 'Florida', county: 'Miami-Dade', city: 'Miami' }, leads: 42, sent: 30, replies: 5, status: 'active', color: '#6366f1' },
-  { id: 'cp2', name: 'Dallas HVAC Blast', niche: 'Home Services', services: ['HVAC'], geography: { state: 'Texas', county: 'Dallas', city: 'Dallas' }, leads: 28, sent: 28, replies: 12, status: 'completed', color: '#22c55e' },
-];
+const INITIAL_CAMPAIGNS = [];
 
 const SYSTEM_CATEGORIES = {
   "Air conditioning contractor": ["AC installation", "AC replacement", "central air installation", "ductless mini split installation", "AC system design", "thermostat installation", "AC maintenance"],

@@ -13,6 +13,9 @@ Welcome to the **User Manual**. This living documentation is maintained by the *
 ### ⚖️ [🔗 LinkedIn Compliance](./LINKEDIN_COMPLIANCE.md)
 *Critical safety and legal rules for LinkedIn outreach.*
 
+### 📊 [📈 Real-Time Datapoints](./DATAPOINTS.md)
+*How the app tracks real metrics for lead qualification.*
+
 ### 1. [✅ Existing Features](./EXISTING_FEATURES.md)
 *What the platform can do right now.*
 - Lead Discovery & Scout Agent
