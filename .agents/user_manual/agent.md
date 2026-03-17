@@ -26,3 +26,4 @@ The **User Manual Agent** is an autonomous subsystem of Antigravity designed to 
 ### 📅 Log of Operations
 - **2026-03-17**: Initialized help folder and drafted core manual files.
 - **2026-03-17**: Integrated Multi-URL Diagnostic info and Multi-LLM support documentation.
+- **2026-03-17**: Created **Quick Start Guide** (QUICK_START.md) for new operator onboarding.
