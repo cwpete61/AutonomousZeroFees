@@ -9,8 +9,8 @@
  *   HUNTER_API_KEY (email finder)
  */
 
-const SCOUT_SYSTEM_PROMPT = `You are a lead research agent for a web design agency.
-Your job is to evaluate whether a local service business has a poor website that would benefit from a redesign.
+const SCOUT_SYSTEM_PROMPT = `You are a lead research agent for an agency that eliminates credit card processing fees for local businesses.
+Your job is to evaluate whether a local service business has a poor website AND high processing volume that would benefit from our "Zero-Fee Profit Shield" so they can keep more money for themselves and their business.
 
   "contactApproach": "recommended tone for outreach",
   "categories": ["list of business categories"],
@@ -19,11 +19,12 @@ Your job is to evaluate whether a local service business has a poor website that
 }
 
 Score factors (each 0-20 points, LOWER total = better lead):
+- Transaction Volume Potential (0=high-ticket/frequent payments like roofing/restaurants, 20=low volume)
 - Mobile responsiveness (0=not responsive, 20=fully responsive)  
 - Page load speed (0=very slow, 20=fast)
 - Visual design quality (0=very outdated, 20=modern)
-- Content clarity (0=confusing, 20=clear)
-- Trust signals: reviews, SSL, contact info (0=none, 20=all present)`;
+- Payment friction (0=no online payment/invoice system, 10=partial, 20=optimized)
+- Customer Reputation (0=high ratings/high traffic, 20=low visibility)`;
 
 const WEBSITE_QUALITY_HEURISTICS = {
     // Red flags that indicate a bad website (each adds to "bad score")
@@ -453,10 +454,13 @@ Technical Metrics:
 - GTMetrix Score: ${business.gtmetrixScore || 'N/A'}/100
 - Pingdom Score: ${business.pingdomScore || 'N/A'}/100
 
-Based on these technical metrics and typical patterns for this type of ${business.industry} business, assess their website quality and provide a compelling redesign pitch.
-LOWER qualityScore (0-60) means the site is a GOOD lead for us (bad website).
+Based on these technical metrics and typical patterns for this type of ${business.industry} business, assess their website quality and their likely monthly credit card processing volume.
+Your goal is to find a "Revenue Bridge": How much could they save by switching to Zero-Fee processing, and can those savings be used to justify a flat-fee website redesign?
+
+LOWER qualityScore (0-60) means the site/business is a GOOD lead for us (bad website + high processing fees).
 HIGHER qualityScore (70-100) means the site is ALREADY GOOD (bad lead for us).
-Return a JSON object with: qualityScore, issues (array), redesignOpportunity (string), and contactApproach.
+
+Return a JSON object with: qualityScore, issues (array), redesignOpportunity (string), processingSavingsEstimate (string), and contactApproach.
 `;
 
         const res = await fetch('https://api.anthropic.com/v1/messages', {

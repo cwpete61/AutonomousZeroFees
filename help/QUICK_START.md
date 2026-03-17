@@ -1,4 +1,4 @@
-# ⚡ Quick Start Guide: Your First 10 Minutes with Orbis Outreach
+# 💰 Profit Shield Guide: Your First 10 Minutes
 
 Welcome to the command center. This guide will take you from a fresh install to launching your first autonomous research batch.
 
@@ -39,8 +39,8 @@ Once diagnostics pass, it's time to scale.
 The machine is now autonomous, but you are the supervisor.
 
 1.  **Pipeline Tab**: Watch leads move from `DISCOVERED` to `QUALIFIED`.
-2.  **Approvals**: Look for the `OUTREACH_PENDING` column. Click on a lead to review the AI-generated email.
-3.  **Approve**: If it looks good, hit **Approve**. The engine will handle the rest of the 10-day sequence.
+2.  **Approvals**: Look for the `OUTREACH_PENDING` column. Click on a lead to review the personalized email showing them how much money they can keep for their business.
+3.  **Approve**: If it looks good, hit **Approve**. The engine will handle the rest of the 10-day "Profit Shield" sequence.
 
 ---
 

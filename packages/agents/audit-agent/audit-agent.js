@@ -14,7 +14,7 @@ class AuditAgent {
      * Perform a technical audit of a website
      */
     async performAudit(url) {
-        console.log(`[Audit] Scanning ${url}`);
+        console.log(`[Audit] Scanning ${url} for Web & Payment signals`);
 
         // Mock audit data
         return {
@@ -22,15 +22,15 @@ class AuditAgent {
             score: Math.floor(Math.random() * 40) + 30, // 30-70 range
             vulnerabilities: [
                 { type: 'performance', issue: 'Large unoptimized images', impact: 'high' },
-                { type: 'seo', issue: 'Missing H1 tags on homepage', impact: 'medium' },
-                { type: 'mobile', issue: 'Content wider than screen', impact: 'critical' }
+                { type: 'processing', issue: 'Likely overpaying 3.5%+ in monthly CC fees', impact: 'critical' },
+                { type: 'mobile', issue: 'Check-out process is not one-click optimized', impact: 'high' }
             ],
             metrics: {
                 loadTime: '4.2s',
-                accessibility: 'OK',
-                bestPractices: 'Needs Work'
+                estMonthlyProcessingWaste: '$450 - $1,200',
+                paymentProvider: 'Generic / Legacy'
             },
-            recommendation: 'Complete layout overhaul required for mobile conversion.',
+            recommendation: 'Switch to Zero-Fee processing so you can keep more money for you and your business.',
             auditedAt: new Date().toISOString()
         };
     }
@@ -40,10 +40,10 @@ class AuditAgent {
      */
     async generateProblemReport(audit) {
         return {
-            title: `Technical Performance Report: ${audit.url}`,
-            summary: `Your website currently scores a ${audit.score}/100 in our performance benchmark.`,
+            title: `Revenue Recovery & Growth Report: ${audit.url}`,
+            summary: `Your business is likely losing over ${audit.metrics.estMonthlyProcessingWaste} per month in processing fees while your website scores a ${audit.score}/100.`,
             topIssues: audit.vulnerabilities.map(v => v.issue),
-            pitchAngle: `I noticed your site is losing customers because it takes ${audit.metrics.loadTime} to load on mobile.`
+            pitchAngle: `I noticed your checkout experience could be improved, but more importantly, you're likely giving away thousands in "junk fees" to your bank—money that you should be keeping for yourself and your business.`
         };
     }
 }

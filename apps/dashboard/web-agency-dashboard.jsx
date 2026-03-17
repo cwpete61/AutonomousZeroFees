@@ -18,7 +18,22 @@ const PIPELINE_STAGES = [
 ];
 
 const SAMPLE_LEADS = [];
-const INITIAL_AGENTS = [];
+const INITIAL_AGENTS = [
+  { name: 'Scout Agent', status: 'idle', lastRun: 'Never', processed: 0 },
+  { name: 'Outreach Agent', status: 'idle', lastRun: 'Never', processed: 0 },
+  { name: 'Design Preview', status: 'idle', lastRun: 'Never', processed: 0 },
+  { name: 'Sales Close', status: 'idle', lastRun: 'Never', processed: 0 },
+  { name: 'Web Build', status: 'idle', lastRun: 'Never', processed: 0 },
+  { name: 'Client Success', status: 'idle', lastRun: 'Never', processed: 0 },
+  { name: 'Content Agent', status: 'idle', lastRun: 'Never', processed: 0 },
+  { name: 'Error Agent', status: 'idle', lastRun: 'Never', processed: 0 },
+  { name: 'Code Agent', status: 'idle', lastRun: 'Never', processed: 0 },
+  { name: 'Email Writing Agent', status: 'idle', lastRun: 'Never', processed: 0 },
+  { name: 'Onboarding Agent', status: 'idle', lastRun: 'Never', processed: 0 },
+  { name: 'Finance Agent', status: 'idle', lastRun: 'Never', processed: 0 },
+  { name: 'SEO Audit Agent', status: 'idle', lastRun: 'Never', processed: 0 },
+  { name: 'Nurture Agent', status: 'idle', lastRun: 'Never', processed: 0 },
+];
 const INITIAL_CRM_CLIENTS = [];
 
 const INITIAL_CAMPAIGNS = [];
@@ -537,7 +552,7 @@ export default function Dashboard() {
   const [isGscAccordionOpen, setIsGscAccordionOpen] = useState(false);
   const [workflowTestUrl, setWorkflowTestUrl] = useState('');
   const [isWorkflowTesting, setIsWorkflowTesting] = useState(false);
-  const [pipelineFitMode, setPipelineFitMode] = useState(false);
+  const [pipelineFitMode, setPipelineFitMode] = useState(true);      
   const [apiKeys, setApiKeys] = useState({});
   const [apiToggles, setApiToggles] = useState({});
   const [testStatus, setTestStatus] = useState({});
@@ -1613,8 +1628,8 @@ export default function Dashboard() {
               ] : [
                 { label: 'Total Leads', value: safeCrmData.length, color: '#6366f1', pct: safeCrmData.length > 0 ? Math.min((safeCrmData.length / 100) * 100, 100) : 0 },
                 { label: 'Campaigns', value: safeCampaigns.length, color: '#22c55e', pct: safeCampaigns.length > 0 ? Math.min((safeCampaigns.length / 10) * 100, 100) : 0 },
-                { label: 'Conversion', value: '11%', color: '#f59e0b', pct: 11 },
-                { label: 'Revenue', value: '$2,994', color: '#14b8a6', pct: 60 },
+                { label: 'Conversion', value: `${safeCrmData.length > 0 ? ((safeCrmData.filter(l => l.paymentStatus === 'paid').length / safeCrmData.length) * 100).toFixed(1) : 0}%`, color: '#f59e0b', pct: safeCrmData.length > 0 ? (safeCrmData.filter(l => l.paymentStatus === 'paid').length / safeCrmData.length) * 100 : 0 },
+                { label: 'Revenue', value: `$${safeCrmData.filter(l => l.paymentStatus === 'paid').reduce((acc, curr) => acc + (curr.amount || 0), 0).toLocaleString()}`, color: '#14b8a6', pct: Math.min((safeCrmData.filter(l => l.paymentStatus === 'paid').reduce((acc, curr) => acc + (curr.amount || 0), 0) / 10000) * 100, 100) },
               ]).map((stat, i) => (
                 <div key={i} style={{ padding: '20px', background: t.card, border: `1px solid ${t.border}`, borderRadius: '12px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
                   <div>
@@ -1763,7 +1778,7 @@ export default function Dashboard() {
                         </div>
                         <div style={{ padding: '12px', background: t.bg, borderRadius: '12px', border: `1px solid ${t.borderFaint}` }}>
                           <div style={{ fontSize: '0.7rem', color: t.textMuted, marginBottom: '4px' }}>Efficiency</div>
-                          <div style={{ fontSize: '1.2rem', fontWeight: 700 }}>98.2%</div>
+                          <div style={{ fontSize: '1.2rem', fontWeight: 700 }}>- %</div>
                         </div>
                       </div>
 
@@ -2309,26 +2324,26 @@ export default function Dashboard() {
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '24px' }}>
                     <div style={{ padding: '24px', background: t.bg, borderRadius: '16px', border: `1px solid ${t.borderSubtle}` }}>
                       <div style={{ fontSize: '0.75rem', color: t.textMuted, fontWeight: 700, textTransform: 'uppercase', marginBottom: '8px' }}>Total Clicks</div>
-                      <div style={{ fontSize: '2rem', fontWeight: 800, color: '#6366f1' }}>12.4K</div>
-                      <div style={{ fontSize: '0.8rem', color: '#22c55e', fontWeight: 600, marginTop: '8px' }}>↑ 14% vs last month</div>
+                      <div style={{ fontSize: '2rem', fontWeight: 800, color: '#6366f1' }}>-</div>
+                      <div style={{ fontSize: '0.8rem', color: t.textMuted, fontWeight: 600, marginTop: '8px' }}>GSC Connection Pending</div>
                     </div>
                     
                     <div style={{ padding: '24px', background: t.bg, borderRadius: '16px', border: `1px solid ${t.borderSubtle}` }}>
                       <div style={{ fontSize: '0.75rem', color: t.textMuted, fontWeight: 700, textTransform: 'uppercase', marginBottom: '8px' }}>Total Impressions</div>
-                      <div style={{ fontSize: '2rem', fontWeight: 800, color: '#a855f7' }}>245K</div>
-                      <div style={{ fontSize: '0.8rem', color: '#22c55e', fontWeight: 600, marginTop: '8px' }}>↑ 8% vs last month</div>
+                      <div style={{ fontSize: '2rem', fontWeight: 800, color: '#a855f7' }}>-</div>
+                      <div style={{ fontSize: '0.8rem', color: t.textMuted, fontWeight: 600, marginTop: '8px' }}>GSC Connection Pending</div>
                     </div>
                     
                     <div style={{ padding: '24px', background: t.bg, borderRadius: '16px', border: `1px solid ${t.borderSubtle}` }}>
                       <div style={{ fontSize: '0.75rem', color: t.textMuted, fontWeight: 700, textTransform: 'uppercase', marginBottom: '8px' }}>Avg. CTR</div>
-                      <div style={{ fontSize: '2rem', fontWeight: 800, color: '#22c55e' }}>5.1%</div>
-                      <div style={{ fontSize: '0.8rem', color: t.textMuted, fontWeight: 600, marginTop: '8px' }}>Stable</div>
+                      <div style={{ fontSize: '2rem', fontWeight: 800, color: '#22c55e' }}>0%</div>
+                      <div style={{ fontSize: '0.8rem', color: t.textMuted, fontWeight: 600, marginTop: '8px' }}>GSC Connection Pending</div>
                     </div>
                     
                     <div style={{ padding: '24px', background: t.bg, borderRadius: '16px', border: `1px solid ${t.borderSubtle}` }}>
                       <div style={{ fontSize: '0.75rem', color: t.textMuted, fontWeight: 700, textTransform: 'uppercase', marginBottom: '8px' }}>Average Position</div>
-                      <div style={{ fontSize: '2rem', fontWeight: 800, color: '#f59e0b' }}>14.2</div>
-                      <div style={{ fontSize: '0.8rem', color: '#22c55e', fontWeight: 600, marginTop: '8px' }}>↑ 1.5 spots</div>
+                      <div style={{ fontSize: '2rem', fontWeight: 800, color: '#f59e0b' }}>-</div>
+                      <div style={{ fontSize: '0.8rem', color: t.textMuted, fontWeight: 600, marginTop: '8px' }}>GSC Connection Pending</div>
                     </div>
                   </div>
                 </div>
@@ -2352,21 +2367,21 @@ export default function Dashboard() {
                       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                         <div>
                           <div style={{ fontSize: '0.7rem', color: t.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Projected MRR</div>
-                          <div style={{ fontSize: '1.1rem', fontWeight: 700 }}>$12,450</div>
+                          <div style={{ fontSize: '1.1rem', fontWeight: 700 }}>$0</div>
                         </div>
                         <div>
                           <div style={{ fontSize: '0.7rem', color: t.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>API Cost/Lead</div>
-                          <div style={{ fontSize: '1.1rem', fontWeight: 700 }}>$0.42</div>
+                          <div style={{ fontSize: '1.1rem', fontWeight: 700 }}>$0.00</div>
                         </div>
                       </div>
                       
                       <div style={{ marginTop: '8px' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', fontWeight: 600, marginBottom: '8px' }}>
                           <span>Cost vs Revenue Efficiency</span>
-                          <span style={{ color: '#6366f1' }}>94%</span>
+                          <span style={{ color: '#6366f1' }}>0%</span>
                         </div>
                         <div style={{ width: '100%', height: '6px', background: t.borderSubtle, borderRadius: '3px', overflow: 'hidden' }}>
-                          <div style={{ width: '94%', height: '100%', background: 'linear-gradient(90deg, #6366f1, #a855f7)', borderRadius: '3px' }} />
+                          <div style={{ width: '0%', height: '100%', background: 'linear-gradient(90deg, #6366f1, #a855f7)', borderRadius: '3px' }} />
                         </div>
                       </div>
                     </div>
@@ -2381,21 +2396,21 @@ export default function Dashboard() {
 
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                       <div style={{ display: 'flex', gap: '24px' }}>
-                        <div style={{ position: 'relative', width: '80px', height: '80px', display: 'flex', justifyContent: 'center', alignItems: 'center', borderRadius: '50%', background: `conic-gradient(#6366f1 82%, ${t.borderSubtle} 0)` }}>
-                          <div style={{ position: 'absolute', width: '64px', height: '64px', background: t.card, borderRadius: '50%', display: 'flex', justifyContent: 'center', alignItems: 'center', fontSize: '1.1rem', fontWeight: 800 }}>82%</div>
+                        <div style={{ position: 'relative', width: '80px', height: '80px', display: 'flex', justifyContent: 'center', alignItems: 'center', borderRadius: '50%', background: `conic-gradient(#6366f1 ${safeCrmData.length > 0 ? (safeCrmData.filter(l => l.paymentStatus === 'paid').length / safeCrmData.length) * 100 : 0}%, ${t.borderSubtle} 0)` }}>
+                          <div style={{ position: 'absolute', width: '64px', height: '64px', background: t.card, borderRadius: '50%', display: 'flex', justifyContent: 'center', alignItems: 'center', fontSize: '1.1rem', fontWeight: 800 }}>{safeCrmData.length > 0 ? ((safeCrmData.filter(l => l.paymentStatus === 'paid').length / safeCrmData.length) * 100).toFixed(1) : 0}%</div>
                         </div>
                         <div style={{ flex: 1 }}>
                           <div style={{ fontSize: '0.75rem', color: t.textMuted, fontWeight: 700, textTransform: 'uppercase', marginBottom: '4px' }}>Conversion Rate</div>
-                          <div style={{ fontSize: '1.4rem', fontWeight: 700 }}>Optimal</div>
-                          <div style={{ fontSize: '0.75rem', color: '#22c55e', fontWeight: 600 }}>+12% vs last month</div>
+                          <div style={{ fontSize: '1.4rem', fontWeight: 700 }}>{safeCrmData.length > 0 ? 'Optimal' : 'Pending Data'}</div>
+                          <div style={{ fontSize: '0.75rem', color: '#22c55e', fontWeight: 600 }}>0% vs last month</div>
                         </div>
                       </div>
 
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                          {[
-                          { label: 'Scout Volume', val: 1240, color: '#6366f1', unit: 'leads' },
-                          { label: 'Outreach Velocity', val: 85, color: '#a855f7', unit: 'emails/hr' },
-                          { label: 'Avg Time to Close', val: 12, color: '#f59e0b', unit: 'days' }
+                          { label: 'Scout Volume', val: safeCrmData.length, color: '#6366f1', unit: 'leads' },
+                          { label: 'Outreach Velocity', val: 0, color: '#a855f7', unit: 'emails/hr' },
+                          { label: 'Avg Time to Close', val: 0, color: '#f59e0b', unit: 'days' }
                         ].map(item => (
                           <div key={item.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.85rem' }}>
                             <span style={{ color: t.textSecondary }}>{item.label}</span>
@@ -2429,17 +2444,17 @@ export default function Dashboard() {
                       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginTop: '4px' }}>
                         <div style={{ padding: '12px', background: t.bg, borderRadius: '12px', border: `1px solid ${t.borderSubtle}` }}>
                           <div style={{ fontSize: '0.65rem', color: t.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Avg Latency</div>
-                          <div style={{ fontSize: '1rem', fontWeight: 700 }}>240ms</div>
+                          <div style={{ fontSize: '1rem', fontWeight: 700 }}>-ms</div>
                         </div>
                         <div style={{ padding: '12px', background: t.bg, borderRadius: '12px', border: `1px solid ${t.borderSubtle}` }}>
                           <div style={{ fontSize: '0.65rem', color: t.textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Job Queue</div>
-                          <div style={{ fontSize: '1rem', fontWeight: 700 }}>Empty</div>
+                          <div style={{ fontSize: '1rem', fontWeight: 700 }}>{dashboardAgents.reduce((acc, a) => acc + (a.processed || 0), 0) > 0 ? 'Active' : 'Empty'}</div>
                         </div>
                       </div>
 
                       <div style={{ padding: '16px', background: 'rgba(99,102,241,0.05)', borderRadius: '12px', border: '1px dashed rgba(99,102,241,0.3)', fontSize: '0.75rem', color: t.textSecondary }}>
-                        <div style={{ fontWeight: 800, color: '#6366f1', marginBottom: '4px' }}>AI SCALING ADVICE</div>
-                        Infrastructure is under-utilized. Recommended: Increase target lead count by 25%.
+                        <div style={{ fontWeight: 800, color: '#6366f1', marginBottom: '4px' }}>SYSTEM STATUS</div>
+                        All systems operational. No active lead generation campaigns running.
                       </div>
                     </div>
                   </div>

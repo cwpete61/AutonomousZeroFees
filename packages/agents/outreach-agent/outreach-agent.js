@@ -18,19 +18,21 @@
  *   IG_ACCESS_TOKEN (optional — for Instagram outreach)
  */
 
-const OUTREACH_SYSTEM_PROMPT = `You are a cold email copywriter for a web design agency that helps local service businesses.
+const OUTREACH_SYSTEM_PROMPT = `You are a cold email copywriter for an agency that helps local businesses grow by reclaiming their lost revenue.
+Your core offer is the "Zero-Fee Profit Shield": You eliminate their credit card processing fees (which are usually 2.5% - 4% of their revenue) so they can keep more money for themselves and their business.
+
 Your job is to write personalized, CAN-SPAM compliant cold emails that get replies.
 
 Rules:
 - Be conversational, not salesy
-- Reference specific problems with their current website
+- Mention BOTH the website issues AND the hidden costs of credit card processing
 - Use the business owner's first name if available
 - Keep subject lines under 50 characters
 - Keep emails under 150 words
 - Include a clear but soft CTA (reply-based, not link-based)
 - Never use spam trigger words (free, guarantee, act now, limited time)
 - Frame as "I noticed" not "I'm selling"
-- Reference their Google reviews or rating as social proof
+- Reference their Google reviews as proof that they deserve better tech
 - Each follow-up must add new value, not just "checking in"
 
 Return JSON:
@@ -639,7 +641,7 @@ Their website is outdated/low-scoring. Open a conversation about their online pr
 
     _fallbackEmail(lead) {
         const name = lead.contactFirstName || 'there';
-        return `Hi ${name},\n\nI came across ${lead.name} while researching ${lead.industry} businesses in ${lead.city || 'your area'}. Your ${lead.googleReviews} Google reviews (${lead.googleRating}★) are impressive — it's clear your customers love what you do.\n\nI noticed your website might not be doing your reputation justice, though. ${lead.redesignPitch || 'A modern redesign could help convert more of those visitors into calls.'}\n\nWould you be open to seeing a quick mockup of what an updated site could look like? No cost, no obligation — just wanted to show you what's possible.\n\nBest,\n${this.fromName}`;
+        return `Hi ${name},\n\nI came across ${lead.name} while looking at local ${lead.industry} businesses in ${lead.city || 'your area'}. Your ${lead.googleReviews} reviews show you're doing great work.\n\nI noticed two things that are likely holding back your growth: your current website isn't fully optimized for conversion, and you're likely paying thousands in unnecessary credit card processing fees every month.\n\nWe specialize in a "Zero-Fee" model that eliminates those processing costs entirely so you can keep more money for you and your business. Because we want to see your business thrive, we even include a premium website redesign at no extra cost to ensure your brand looks as good as your service.\n\nWould you be open to a quick 2-minute chat to see how much we can save you?\n\nBest,\n${this.fromName}`;
     }
 
     _fallbackFollowUp(lead, num) {

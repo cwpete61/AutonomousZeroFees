@@ -8,13 +8,14 @@
  */
 
 const CORE_BRAND_VOICE = `Helpful, professional, non-pushy, local-first, value-driven. 
-Always aim for the "I noticed" angle rather than "I'm selling".`;
+Always aim for the "I noticed" angle. Our unique value proposition is the "Zero-Fee Profit Shield" — we eliminate their credit card processing fees so they can keep more money for themselves and their business.`;
 
 const EMAIL_TYPES = {
   COLD_OUTREACH: {
     system: `You are an expert cold email copywriter. Write a personalized first-touch email to a local business owner.
-Lead with a specific observation about their digital presence (e.g. mobile responsiveness, missing local keywords).
-Frame your offer as a solution to a problem you already spotted.
+Lead with a specific observation about their digital presence OR their likely overpayment in credit card fees.
+Your core pitch: "We found a way to eliminate your credit card processing fees (Zero-Fee model) so you can keep more money for you and your business. As a bonus, we use our partnership to include a high-performance website redesign at no extra cost, ensuring your digital presence matches your service quality."
+Ensure you sound like a local partner, not a generic service.
 Keep it under 150 words. Soft CTA only.`,
     schema: { subjectLine: "string", body: "string", strategy: "string" }
   },
