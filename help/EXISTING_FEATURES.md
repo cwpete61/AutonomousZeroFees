@@ -15,12 +15,19 @@ The system is "Engine Agnostic," allowing operators to choose their preferred AI
 - **OpenAI Logic**: GPT-4o for high-speed template generation and structured data auditing.
 - **Dynamic Selection**: Switch engines per campaign or diagnostic run via the Dashboard.
 
-## 3. AutoWriteEmail™
+## 3. Social & Discovery Integrations
+The API Hub now supports:
+- **LinkedIn (B2B)**: Automated connection requests and InMail.
+- **Facebook & Instagram**: Lead engagement via business direct messaging.
+- **Google Places**: High-precision local business discovery.
+- **Twilio**: SMS and Voice follow-up automation.
+
+## 4. AutoWriteEmail™
 - **Hyper-Personalization**: Instead of broad templates, the AI uses specific signals (e.g., "Your site takes 4s to load") to write individual emails.
 - **Sequence Generation**: Automatically builds 3-5 step sequences with follow-up delays.
 - **Tone Control**: Support for multiple outreach styles (Friendly, Professional, Aggressive).
 
-## 4. Multi-URL Diagnostic Environment
+## 5. Multi-URL Diagnostic Environment
 - **Targeted Injection**: Bypass the scraper to test specific URLs immediately.
 - **Batch Support**: Paste a list of competitor or client URLs to see how the Scout Agent handles them in parallel.
 - **Safety**: Uses a dedicated `SYSTEM_DIAGNOSTIC_CAMPAIGN` to keep test data separate from live pipelines.

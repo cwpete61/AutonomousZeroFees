@@ -10,6 +10,9 @@ Welcome to the **User Manual**. This living documentation is maintained by the *
 ### 🚀 [🧪 Full E2E Test Setup](./FULL_TEST_SETUP.md)
 *Running real-world campaigns with Email, LinkedIn, and SMS.*
 
+### ⚖️ [🔗 LinkedIn Compliance](./LINKEDIN_COMPLIANCE.md)
+*Critical safety and legal rules for LinkedIn outreach.*
+
 ### 1. [✅ Existing Features](./EXISTING_FEATURES.md)
 *What the platform can do right now.*
 - Lead Discovery & Scout Agent

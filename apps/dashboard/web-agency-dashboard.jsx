@@ -283,6 +283,10 @@ const API_COST_MODELS = {
       { id: 'runware:z-image@0', name: 'Z-Image', costPerLead: 0.012, description: 'High quality generation' }
     ]
   },
+  linkedin: { name: 'LinkedIn (B2B)', costPerLead: 0.05, multiplier: 1.5, available: '∞', icon: '🔗' },
+  facebook: { name: 'Facebook Outreach', costPerLead: 0.02, multiplier: 1.0, available: '∞', icon: '👥' },
+  instagram: { name: 'Instagram DM', costPerLead: 0.02, multiplier: 1.0, available: '∞', icon: '📸' },
+  google_places: { name: 'Google Places', costPerLead: 0.01, multiplier: 1.0, available: '∞', icon: '📍' },
 };
 
 // INITIAL_USERS removed in favor of backend API
@@ -2534,8 +2538,9 @@ export default function Dashboard() {
                   </div>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(8, 1fr)', gap: '12px' }}>
                     {[
-                      'dataseo', 'pagespeed', 'hunter', 'instantly', 
+                      'dataseo', 'pagespeed', 'google_places', 'hunter', 'instantly', 
                       'reoon', 'twilio', 'stripe', 'whatsapp', 'resend',
+                      'linkedin', 'facebook', 'instagram',
                       'gtmetrix', 'pingdom'
                     ].map(renderApiCard)}
                   </div>
