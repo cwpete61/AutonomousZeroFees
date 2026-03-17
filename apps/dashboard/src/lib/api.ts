@@ -147,10 +147,10 @@ export const settingsApi = {
 };
 
 export const diagnosticsApi = {
-  runWorkflowTest: (url: string) =>
+  runWorkflowTest: (urls: string | string[]) =>
     apiFetch("/diagnostics/workflow-test", {
       method: "POST",
-      body: JSON.stringify({ url }),
+      body: JSON.stringify({ urls }),
     }),
 };
 

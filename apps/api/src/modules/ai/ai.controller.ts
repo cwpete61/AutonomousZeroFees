@@ -26,6 +26,14 @@ export class GenerateEmailsDto {
     @Min(3)
     @Max(5)
     step_count: number; // 3 | 4 | 5
+
+    @IsOptional()
+    @IsString()
+    provider?: 'anthropic' | 'openai';
+
+    @IsOptional()
+    @IsString()
+    model?: string;
 }
 
 @Controller('ai')

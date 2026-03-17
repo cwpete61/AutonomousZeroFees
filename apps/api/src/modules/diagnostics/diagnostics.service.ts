@@ -13,8 +13,9 @@ export class DiagnosticsService {
         @InjectQueue('research-queue') private researchQueue: Queue
     ) { }
 
-    async runWorkflowTest(url: string) {
-        this.logger.log(`Starting workflow test diagnostic for URL: ${url}`);
+    async runWorkflowTest(urls: string | string[]) {
+        const urlList = Array.isArray(urls) ? urls : [urls];
+        this.logger.log(`Starting workflow test diagnostic for ${urlList.length} URLs`);
 
         // 1. Ensure a diagnostic campaign exists
         let campaign = await this.prisma.campaign.findFirst({
@@ -34,33 +35,47 @@ export class DiagnosticsService {
             });
         }
 
-        // 2. Create a temporary business and lead
-        const business = await this.prisma.business.create({
-            data: {
-                name: `Diagnostic: ${new URL(url).hostname}`,
-                websiteUrl: url,
-                niche: 'Diagnostic'
+        const results = [];
+
+        for (const url of urlList) {
+            try {
+                const cleanUrl = url.trim();
+                if (!cleanUrl) continue;
+
+                // 2. Create a temporary business and lead
+                const business = await this.prisma.business.create({
+                    data: {
+                        name: `Diagnostic: ${new URL(cleanUrl).hostname}`,
+                        websiteUrl: cleanUrl,
+                        niche: 'Diagnostic'
+                    }
+                });
+
+                const lead = await this.prisma.lead.create({
+                    data: {
+                        campaignId: campaign.id,
+                        businessId: business.id,
+                        status: 'DISCOVERED' as LeadStatus,
+                    },
+                    include: { business: true }
+                });
+
+                // 3. Manually enqueue to research-queue
+                await this.researchQueue.add('research', lead, {
+                    attempts: 1, // diagnostic should be quick
+                    removeOnComplete: true
+                });
+
+                results.push({ url: cleanUrl, leadId: lead.id, status: 'started' });
+            } catch (err) {
+                this.logger.error(`Failed to start diagnostic for ${url}: ${err.message}`);
+                results.push({ url, status: 'failed', error: err.message });
             }
-        });
-
-        const lead = await this.prisma.lead.create({
-            data: {
-                campaignId: campaign.id,
-                businessId: business.id,
-                status: 'DISCOVERED' as LeadStatus,
-            },
-            include: { business: true }
-        });
-
-        // 3. Manually enqueue to research-queue
-        await this.researchQueue.add('research', lead, {
-            attempts: 1, // diagnostic should be quick
-            removeOnComplete: true
-        });
+        }
 
         return {
-            message: 'Diagnostic workout started',
-            leadId: lead.id,
+            message: `Diagnostic workflow started for ${results.filter(r => r.status === 'started').length} URLs`,
+            results,
             campaignId: campaign.id
         };
     }

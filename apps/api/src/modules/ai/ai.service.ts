@@ -123,6 +123,8 @@ export interface EmailInputs {
     sender_name: string;
     sender_company: string;
     step_count: number;
+    provider?: 'anthropic' | 'openai';
+    model?: string;
 }
 
 export interface GeneratedEmail {
@@ -138,16 +140,17 @@ export interface GeneratedSequence {
 
 @Injectable()
 export class AiService {
-    private readonly apiKey = process.env.ANTHROPIC_API_KEY;
-    private readonly model = 'claude-sonnet-4-20250514';
-    private readonly apiUrl = 'https://api.anthropic.com/v1/messages';
+    private readonly anthropicKey = process.env.ANTHROPIC_API_KEY;
+    private readonly openaiKey = process.env.OPENAI_API_KEY;
 
     async generateEmailSequence(inputs: EmailInputs): Promise<GeneratedSequence> {
-        if (!this.apiKey) {
-            throw new HttpException(
-                'ANTHROPIC_API_KEY is not configured',
-                HttpStatus.SERVICE_UNAVAILABLE,
-            );
+        const provider = inputs.provider || 'anthropic';
+        
+        if (provider === 'anthropic' && !this.anthropicKey) {
+            throw new HttpException('ANTHROPIC_API_KEY not configured', HttpStatus.SERVICE_UNAVAILABLE);
+        }
+        if (provider === 'openai' && !this.openaiKey) {
+            throw new HttpException('OPENAI_API_KEY not configured', HttpStatus.SERVICE_UNAVAILABLE);
         }
 
         const prompts: ((v: EmailInputs) => string)[] = [
@@ -158,9 +161,12 @@ export class AiService {
             PROMPT_5,
         ].slice(0, inputs.step_count);
 
-        // Call Claude for each step in parallel
         const results = await Promise.all(
-            prompts.map((buildPrompt) => this.callClaude(buildPrompt(inputs))),
+            prompts.map((buildPrompt) => 
+                provider === 'openai' 
+                ? this.callOpenAI(buildPrompt(inputs), inputs.model || 'gpt-4o')
+                : this.callClaude(buildPrompt(inputs), inputs.model || 'claude-3-5-sonnet-20240620')
+            ),
         );
 
         const sequence: GeneratedSequence = {};
@@ -171,33 +177,57 @@ export class AiService {
         return sequence;
     }
 
-    private async callClaude(prompt: string): Promise<GeneratedEmail> {
-        const response = await fetch(this.apiUrl, {
+    private async callClaude(prompt: string, model: string): Promise<GeneratedEmail> {
+        const response = await fetch('https://api.anthropic.com/v1/messages', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'x-api-key': this.apiKey as string,
+                'x-api-key': this.anthropicKey as string,
                 'anthropic-version': '2023-06-01',
             } as Record<string, string>,
             body: JSON.stringify({
-                model: this.model,
-                max_tokens: 400,
+                model,
+                max_tokens: 600,
                 messages: [{ role: 'user', content: prompt }],
             }),
         });
 
         if (!response.ok) {
-            throw new HttpException(
-                `Claude API error: ${response.status}`,
-                HttpStatus.BAD_GATEWAY,
-            );
+            throw new HttpException(`Claude API error: ${response.status}`, HttpStatus.BAD_GATEWAY);
         }
 
         const data = await response.json();
-        const raw = data.content?.[0]?.text ?? '{}';
+        return this.parseJsonOutput(data.content?.[0]?.text ?? '{}');
+    }
 
+    private async callOpenAI(prompt: string, model: string): Promise<GeneratedEmail> {
+        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${this.openaiKey}`,
+            },
+            body: JSON.stringify({
+                model,
+                messages: [{ role: 'user', content: prompt }],
+                response_format: { type: 'json_object' },
+                max_tokens: 600,
+            }),
+        });
+
+        if (!response.ok) {
+            const err = await response.json().catch(() => ({}));
+            throw new HttpException(`OpenAI API error: ${response.status} - ${JSON.stringify(err)}`, HttpStatus.BAD_GATEWAY);
+        }
+
+        const data = await response.json();
+        return this.parseJsonOutput(data.choices?.[0]?.message?.content ?? '{}');
+    }
+
+    private parseJsonOutput(raw: string): GeneratedEmail {
         try {
-            const parsed = JSON.parse(raw.replace(/```json|```/g, '').trim());
+            const clean = raw.replace(/```json|```/g, '').trim();
+            const parsed = JSON.parse(clean);
             return {
                 subject: parsed.subject ?? '',
                 body: parsed.body ?? '',

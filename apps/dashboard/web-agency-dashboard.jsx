@@ -624,7 +624,7 @@ export default function Dashboard() {
 
   // ─── Email Sequences State ────────────────────────────────────────
   const blankEmailStep = (step) => ({ step, subject: '', body: '', delayDays: step === 1 ? 0 : 3 });
-  const blankSequence = () => ({ name: '', steps: 3, emails: [blankEmailStep(1), blankEmailStep(2), blankEmailStep(3)], assignedCampaignId: null });
+  const blankSequence = () => ({ name: '', steps: 3, emails: [blankEmailStep(1), blankEmailStep(2), blankEmailStep(3)], assignedCampaignId: null, autoWriteEmail: false });
   const [emailSequences, setEmailSequences] = useState([]);
   const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
   const [editingSequenceId, setEditingSequenceId] = useState(null);
@@ -642,6 +642,8 @@ export default function Dashboard() {
     secondary_outcome: '',
     sender_name: '',
     sender_company: 'Orbis Outreach - BPS',
+    provider: 'anthropic',
+    model: 'claude-3-5-sonnet-20240620'
   });
 
   useEffect(() => {
@@ -928,8 +930,11 @@ export default function Dashboard() {
           alert('Cannot start test while Master Sync is Offline.');
           return;
         }
-        await diagnosticsApi.runWorkflowTest(workflowTestUrl);
-        alert('Workflow Test Started! Head over to the AGENTS tab to watch the Scout Agent in action.');
+        const urls = workflowTestUrl.split(/[\n,]+/).map(u => u.trim()).filter(Boolean);
+        if (urls.length === 0) return;
+
+        await diagnosticsApi.runWorkflowTest(urls);
+        alert(`${urls.length} Workflow Test(s) Started! Head over to the AGENTS tab to watch the Scout Agent in action.`);
         setWorkflowTestUrl('');
         setIsWorkflowTestAccordionOpen(false);
     } catch (err) {
@@ -1333,7 +1338,7 @@ export default function Dashboard() {
       }));
     } catch (err) {
       if (!err.isOffline) {
-        setAiGenError(err.message || 'Generation failed. Check ANTHROPIC_API_KEY in API settings.');
+        setAiGenError(err.message || 'Generation failed. Check your API keys in the .env file.');
       }
     } finally {
       setAiGenerating(false);
@@ -2132,6 +2137,21 @@ export default function Dashboard() {
                         </div>
                       </div>
 
+                      {/* AutoWriteEmail™ Toggle */}
+                      <div style={{ padding: '16px', background: 'linear-gradient(135deg, rgba(99,102,241,0.05), rgba(139,92,246,0.05))', borderRadius: '12px', border: `1px solid ${newSequence.autoWriteEmail ? 'rgba(99,102,241,0.3)' : t.borderSubtle}`, marginBottom: '4px' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                          <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#6366f1', textTransform: 'uppercase', letterSpacing: '0.05em' }}>AutoWriteEmail™</span>
+                          <div onClick={() => setNewSequence({ ...newSequence, autoWriteEmail: !newSequence.autoWriteEmail })} style={{ width: 44, height: 22, background: newSequence.autoWriteEmail ? 'linear-gradient(135deg, #6366f1, #8b5cf6)' : t.barBg, borderRadius: 11, cursor: 'pointer', position: 'relative', transition: '0.3s' }}>
+                            <div style={{ width: 16, height: 16, background: '#fff', borderRadius: '50%', position: 'absolute', top: 3, left: newSequence.autoWriteEmail ? 25 : 3, transition: '0.3s', boxShadow: '0 1px 3px rgba(0,0,0,0.2)' }} />
+                          </div>
+                        </div>
+                        <div style={{ fontSize: '0.68rem', color: t.textMuted, lineHeight: 1.4 }}>
+                          {newSequence.autoWriteEmail 
+                            ? "✨ AI will automatically populate and personalize every lead's outreach." 
+                            : "⚪ Manual sequence management enabled."}
+                        </div>
+                      </div>
+
                       {/* ✨ AI Generate Panel */}
                       <div style={{ borderRadius: '10px', border: `1px solid ${aiPanelOpen ? '#6366f1' : t.borderSubtle}`, overflow: 'hidden', transition: 'border-color 0.2s' }}>
                         <button onClick={() => setAiPanelOpen(p => !p)} style={{ width: '100%', padding: '10px 14px', background: aiPanelOpen ? 'rgba(99,102,241,0.1)' : 'transparent', border: 'none', color: aiPanelOpen ? '#818cf8' : t.textSecondary, cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontWeight: 700, fontSize: '0.82rem' }}>
@@ -2151,7 +2171,50 @@ export default function Dashboard() {
                                 />
                               </div>
                             ))}
+
+                            {/* Provider & Model Selection */}
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                              <div>
+                                <label style={{ fontSize: '0.68rem', fontWeight: 600, color: t.textMuted, display: 'block', marginBottom: '3px' }}>Provider</label>
+                                <select
+                                  value={aiInputs.provider}
+                                  onChange={e => setAiInputs(prev => ({ 
+                                    ...prev, 
+                                    provider: e.target.value,
+                                    model: e.target.value === 'openai' ? 'gpt-4o' : 'claude-3-5-sonnet-20240620'
+                                  }))}
+                                  style={{ width: '100%', padding: '7px 8px', background: t.bg, border: `1px solid ${t.borderSubtle}`, borderRadius: '6px', color: t.text, fontSize: '0.78rem', outline: 'none' }}
+                                >
+                                  <option value="anthropic">Anthropic</option>
+                                  <option value="openai">OpenAI</option>
+                                </select>
+                              </div>
+                              <div>
+                                <label style={{ fontSize: '0.68rem', fontWeight: 600, color: t.textMuted, display: 'block', marginBottom: '3px' }}>Model</label>
+                                <select
+                                  value={aiInputs.model}
+                                  onChange={e => setAiInputs(prev => ({ ...prev, model: e.target.value }))}
+                                  style={{ width: '100%', padding: '7px 8px', background: t.bg, border: `1px solid ${t.borderSubtle}`, borderRadius: '6px', color: t.text, fontSize: '0.78rem', outline: 'none' }}
+                                >
+                                  {aiInputs.provider === 'anthropic' ? (
+                                    <>
+                                      <option value="claude-3-5-sonnet-20240620">Claude 3.5 Sonnet</option>
+                                      <option value="claude-3-opus-20240229">Claude 3 Opus</option>
+                                      <option value="claude-3-haiku-20240307">Claude 3 Haiku</option>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <option value="gpt-4o">GPT-4o</option>
+                                      <option value="gpt-4-turbo">GPT-4 Turbo</option>
+                                      <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
+                                    </>
+                                  )}
+                                </select>
+                              </div>
+                            </div>
+
                             {aiGenError && <div style={{ fontSize: '0.72rem', color: '#ef4444', backgroundColor: 'rgba(239,68,68,0.08)', padding: '8px 10px', borderRadius: '6px' }}>{aiGenError}</div>}
+
                             <button
                               onClick={generateEmailsWithAI}
                               disabled={aiGenerating || !aiInputs.industry || !aiInputs.pain_point_signal || !aiInputs.primary_outcome}
@@ -2168,8 +2231,11 @@ export default function Dashboard() {
                         <label style={{ fontSize: '0.75rem', fontWeight: 700, color: '#6366f1', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '8px' }}>Steps</label>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                           {newSequence.emails.map((email, i) => (
-                            <button key={i} onClick={() => setActiveEmailStep(i + 1)} style={{ padding: '10px 12px', borderRadius: '8px', border: `1px solid ${activeEmailStep === i + 1 ? '#6366f1' : t.borderSubtle}`, background: activeEmailStep === i + 1 ? 'rgba(99,102,241,0.1)' : 'transparent', color: activeEmailStep === i + 1 ? '#818cf8' : t.textSecondary, cursor: 'pointer', textAlign: 'left', fontSize: '0.82rem', fontWeight: activeEmailStep === i + 1 ? 700 : 500 }}>
-                              <div>Email {i + 1}</div>
+                             <button key={i} onClick={() => setActiveEmailStep(i + 1)} style={{ padding: '10px 12px', borderRadius: '8px', border: `1px solid ${activeEmailStep === i + 1 ? '#6366f1' : t.borderSubtle}`, background: activeEmailStep === i + 1 ? 'rgba(99,102,241,0.1)' : 'transparent', color: activeEmailStep === i + 1 ? '#818cf8' : t.textSecondary, cursor: 'pointer', textAlign: 'left', fontSize: '0.82rem', fontWeight: activeEmailStep === i + 1 ? 700 : 500 }}>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <span>Email {i + 1}</span>
+                                {newSequence.autoWriteEmail && <span style={{ fontSize: '0.6rem', padding: '2px 4px', background: 'rgba(99,102,241,0.15)', color: '#818cf8', borderRadius: '4px', fontWeight: 800 }}>AUTO</span>}
+                              </div>
                               <div style={{ fontSize: '0.7rem', color: t.textMuted, marginTop: '2px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                                 {email.subject || 'No subject yet'}
                               </div>
@@ -2767,26 +2833,25 @@ export default function Dashboard() {
                   <div onClick={() => setIsWorkflowTestAccordionOpen(!isWorkflowTestAccordionOpen)} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}>
                     <div>
                       <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 700, color: '#f59e0b' }}>Workflow Test (Diagnostic) {isWorkflowTestAccordionOpen ? '▴' : '▾'}</h3>
-                      <p style={{ margin: '4px 0 0 0', fontSize: '0.8rem', color: t.textMuted }}>Inject a single business URL to test the entire E2E pipeline</p>
+                      <p style={{ margin: '4px 0 0 0', fontSize: '0.8rem', color: t.textMuted }}>Inject one or more business URLs to test the entire E2E pipeline</p>
                     </div>
                   </div>
 
                   {isWorkflowTestAccordionOpen && (
                     <div style={{ marginTop: '24px' }}>
                       <div style={{ padding: '24px', background: 'rgba(245,158,11,0.05)', borderRadius: '16px', border: `1px solid rgba(245,158,11,0.2)` }}>
-                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: '#f59e0b', marginBottom: '12px' }}>TARGET BUSINESS URL</label>
-                        <div style={{ display: 'flex', gap: '12px' }}>
-                          <input 
-                            type="text" 
+                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: '#f59e0b', marginBottom: '12px' }}>TARGET BUSINESS URL(S)</label>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                          <textarea 
                             value={workflowTestUrl}
                             onChange={e => setWorkflowTestUrl(e.target.value)}
-                            placeholder="https://example-plumbing.com" 
-                            style={{ flex: 1, padding: '14px', background: t.card, border: `1px solid ${t.borderSubtle}`, borderRadius: '10px', color: t.text, outline: 'none' }}
+                            placeholder="Enter URLs (one per line or comma-separated)&#10;https://example-plumbing.com&#10;https://city-dental.com" 
+                            style={{ width: '100%', minHeight: '100px', padding: '14px', background: t.card, border: `1px solid ${t.borderSubtle}`, borderRadius: '10px', color: t.text, outline: 'none', resize: 'vertical', fontFamily: 'inherit' }}
                           />
                           <button 
                             onClick={handleRunWorkflowTest}
-                            disabled={isWorkflowTesting || !workflowTestUrl}
-                            style={{ padding: '0 32px', background: '#f59e0b', color: '#fff', border: 'none', borderRadius: '10px', fontWeight: 700, cursor: 'pointer', opacity: (isWorkflowTesting || !workflowTestUrl) ? 0.5 : 1 }}
+                            disabled={isWorkflowTesting || !workflowTestUrl.trim()}
+                            style={{ alignSelf: 'flex-end', padding: '12px 32px', background: '#f59e0b', color: '#fff', border: 'none', borderRadius: '10px', fontWeight: 700, cursor: 'pointer', opacity: (isWorkflowTesting || !workflowTestUrl.trim()) ? 0.5 : 1 }}
                           >
                             {isWorkflowTesting ? 'Firing Up...' : 'Run E2E Test'}
                           </button>

@@ -8,7 +8,8 @@ export class DiagnosticsController {
 
     @UseGuards(JwtAuthGuard)
     @Post('workflow-test')
-    async runWorkflowTest(@Body('url') url: string) {
-        return this.diagnosticsService.runWorkflowTest(url);
+    async runWorkflowTest(@Body() body: { url?: string; urls?: string[] }) {
+        const input = body.urls || body.url || [];
+        return this.diagnosticsService.runWorkflowTest(input);
     }
 }

@@ -39,4 +39,8 @@ export class CreateEmailSequenceDto {
     @IsString()
     @IsOptional()
     assignedCampaignId?: string;
+
+    @ApiPropertyOptional({ example: true, default: false })
+    @IsOptional()
+    autoWriteEmail?: boolean;
 }
