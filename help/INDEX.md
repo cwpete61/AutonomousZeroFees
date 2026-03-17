@@ -7,6 +7,9 @@ Welcome to the **User Manual**. This living documentation is maintained by the *
 ### 0. [⚡ Quick Start Guide](./QUICK_START.md)
 *Start here if you are a new operator.*
 
+### 🚀 [🧪 Full E2E Test Setup](./FULL_TEST_SETUP.md)
+*Running real-world campaigns with Email, LinkedIn, and SMS.*
+
 ### 1. [✅ Existing Features](./EXISTING_FEATURES.md)
 *What the platform can do right now.*
 - Lead Discovery & Scout Agent
