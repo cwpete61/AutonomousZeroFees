@@ -1,8 +1,8 @@
-# Autonomous Web Agency System
+# Merchant Recovery AI (Profit Shield)
 ## Technical Specification v1.1
-### Containerized Multi-Agent Platform for Lead Generation, Outreach, Sales, Fulfillment, Content, Reliability, and Client Operations
+### Containerized Multi-Agent Platform for Fee Discovery, Outreach, Profit Auditing, Reinvestment, and Client Operations
 
-Autonomous web agency architecture is a Dockerized, PostgreSQL-backed, state-driven agent platform that uses a dashboard as the command center, an orchestrator as the control layer, specialist agents for business workflows, and operational subsystems for backups, maintenance, incidents, and admin/client management.
+Profit Shield AI is a Dockerized, PostgreSQL-backed, state-driven agent platform that identifies businesses overpaying legacy processing fees, audits their "Profit Leak," and automates the transition to "Zero-Fee" processing models.
 
 > [!IMPORTANT]
 > **v1.1 Changes from v1:** Added missing data models (AuditLog, ApprovalRequest, Campaign, Notification), expanded LeadStatus with failure/terminal states, added Docker health checks, defined retry/backoff strategy, added event bus layer, worker isolation plan, API rate limiting, and secrets management guidance.
@@ -12,15 +12,15 @@ Autonomous web agency architecture is a Dockerized, PostgreSQL-backed, state-dri
 ## 1. Purpose
 This specification defines the first production-ready version of your autonomous web agency system.
 The platform must:
-- find U.S. service businesses with weak websites
-- audit and score those businesses
+- find U.S. service businesses with high processing volume
+- audit and score their processing "Profit Leak"
 - enrich contact records
-- generate and send cold outreach
-- create blurred redesign previews
-- handle replies, demos, proposals, and invoices
-- move paid clients into fulfillment
-- build websites and content assets
-- support client communication and project delivery
+- generate and send cold outreach focus on margin retention
+- create Profit Recovery Reports (Audits)
+- handle replies, activation agreements, and growth plans
+- move paid clients into active recovery
+- deploy growth assets funded by reclaimed fees
+- support client communication and weekly recovery reports
 - run inside Docker containers
 - use PostgreSQL with vector support
 - integrate your existing dashboard as the control plane
@@ -48,10 +48,9 @@ Every business object must move through explicit states. No silent transitions.
 ### 3.2 Human review at risk points
 Human approval remains mandatory before:
 - outreach send
-- preview send
-- full demo send
-- invoice send
-- final delivery
+- recovery audit send
+- final activation agreement send
+- growth plan delivery
 
 All approval actions must be tracked via an `ApprovalRequest` record with reviewer, decision, and timestamps.
 
@@ -74,7 +73,7 @@ graph TD
     API["API Layer<br/>Auth | Business Logic | Webhooks | Rate Limiting | Access Control"]
     EventBus["Event Bus<br/>Domain Events | Cross-cutting Notifications | Audit Trail Emitter"]
     Orchestrator["Orchestrator / Workflow Engine<br/>State Machine | Routing | Rules | Handoffs | Escalations"]
-    Workers["Worker / Agent Runtime<br/>Scout | Outreach | Preview | Sales | Build | Success<br/>Content | Error | Code | Support Services"]
+    Workers["Worker / Agent Runtime<br/>Scout | Outreach | Profit Audit | Sales | Growth | Success<br/>Content | Error | Code | Support Services"]
     Persistence["Persistence / Infrastructure<br/>PostgreSQL + pgvector | Redis | Object Storage | Logs"]
 
     Dashboard --> API
@@ -129,11 +128,11 @@ The orchestrator is the workflow controller. It must:
 
 ### 5.4 Worker Layer
 Workers execute background tasks:
-- audits
+- profit audits
 - enrichment
 - email sequencing
-- preview generation
-- proposal creation
+- recovery report generation
+- agreement creation
 - backup jobs
 - maintenance sweeps
 - incident classification
@@ -236,9 +235,9 @@ This app hosts background job execution.
 ### 8.1 packages/orchestrator
 Contains the workflow engine.
 ### 8.2 packages/agents
-Contains visible agent modules (Scout, Outreach, Design Preview, Sales Close, Web Build, Client Success, Content, Error, Code).
+Contains visible agent modules (Scout, Outreach, Profit Audit, Sales Close, Growth, Client Success, Content, Error, Code).
 ### 8.3 packages/services
-Contains hidden support services (Audit, Qualification, Enrichment, Reply Classification, Payment, Backup, Maintenance, Storage, Screenshot, Embedding, Compliance, Notification).
+Contains hidden support services (Recovery Audit, Qualification, Enrichment, Reply Classification, Payment, Backup, Maintenance, Storage, Screenshot, Embedding, Compliance, Notification).
 ### 8.4 packages/db
 Contains Prisma and DB assets.
 ### 8.5 packages/events *(NEW)*
@@ -441,14 +440,13 @@ enum LeadStatus {
   OUTREACH_SENT
   OUTREACH_FAILED       // NEW — bounce/delivery failure
   REPLIED
-  DEMO_PENDING
-  DEMO_SENT
-  DEMO_FAILED           // NEW — generation/delivery failure
-  PROPOSAL_SENT
-  INVOICE_SENT
+  AUDIT_PENDING
+  AUDIT_SENT
+  AUDIT_FAILED          // NEW — generation/delivery failure
+  AGREEMENT_SENT
   PAID
-  BUILD_STARTED
-  BUILD_FAILED          // NEW — build failure
+  RECOVERY_STARTED
+  RECOVERY_FAILED       // NEW — activation failure
   REVIEW_PENDING
   DELIVERED
   CLOSED_WON            // NEW — terminal success state
