@@ -36,7 +36,7 @@ export class ScoutProcessor extends BaseProcessor {
         data: {
           status: "RESEARCHED",
           qualificationScore: results.qualityScore,
-          discoveryNotes: results.redesignPitch,
+          discoveryNotes: results.profitShieldPitch,
         },
         include: { business: true },
       });

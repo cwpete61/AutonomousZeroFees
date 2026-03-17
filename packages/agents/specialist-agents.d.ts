@@ -1,5 +1,5 @@
 /**
- * Autonomous Web Agency — Agents Type Declarations
+ * Profit Shield AI — Agents Type Declarations
  */
 
 export class ScoutAgent {
@@ -24,14 +24,12 @@ export class DesignPreviewAgent {
 export class SalesCloseAgent {
     constructor(config?: any);
     handleReply(lead: any, replyContent: string, classification?: any): Promise<any>;
-    sendDemo(lead: any): Promise<any>;
     generateProposal(lead: any, packageTier?: string): Promise<any>;
-    createInvoice(lead: any, proposal: any): Promise<any>;
+    createAgreement(lead: any, proposal: any): Promise<any>;
 }
 export class WebBuildAgent {
     constructor(config?: any);
-    startBuild(lead: any): Promise<any>;
-    generatePage(brief: any, filename: string): Promise<any>;
+    startDeployment(lead: any): Promise<any>;
 }
 export class ClientSuccessAgent {
     constructor(config?: any);
@@ -43,8 +41,7 @@ export class ClientSuccessAgent {
 export class ContentAgent {
     constructor(config?: any);
     generateContent(brief: any, assetType: string): Promise<any>;
-    generateContentChecklist(brief: any): Promise<any>;
-    generateBlogPost(brief: any, topic: string): Promise<any>;
+    generateGrowthChecklist(brief: any): Promise<any>;
 }
 export class ErrorAgent { }
 export class CodeAgent { }
@@ -54,7 +51,7 @@ export class FinanceAgent { }
 export class AuditAgent {
     constructor(config?: any);
     performAudit(url: string): Promise<any>;
-    generateProblemReport(audit: any): Promise<any>;
+    generateRecoveryReport(audit: any): Promise<any>;
 }
 export class NurtureAgent {
     constructor(config?: any);
@@ -62,7 +59,7 @@ export class NurtureAgent {
     generateValueDrop(lead: any): Promise<any>;
 }
 
-export const WEBSITE_QUALITY_HEURISTICS: any;
+export const FINANCIAL_WASTE_HEURISTICS: any;
 export const EMAIL_SEQUENCES: any;
 export const SOCIAL_CHANNELS: any;
 export const PRICING: any;

@@ -12,11 +12,11 @@ Always aim for the "I noticed" angle. Our unique value proposition is the "Zero-
 
 const EMAIL_TYPES = {
   COLD_OUTREACH: {
-    system: `You are an expert cold email copywriter. Write a personalized first-touch email to a local business owner.
-Lead with a specific observation about their digital presence OR their likely overpayment in credit card fees.
-Your core pitch: "We found a way to eliminate your credit card processing fees (Zero-Fee model) so you can keep more money for you and your business. As a bonus, we use our partnership to include a high-performance website redesign at no extra cost, ensuring your digital presence matches your service quality."
-Ensure you sound like a local partner, not a generic service.
-Keep it under 150 words. Soft CTA only.`,
+    system: `You are an expert cold email copywriter for a financial recovery agency. Write a personalized first-touch email to a local business owner.
+Lead with a specific observation about their likely overpayment in credit card fees (the "Processing Leak").
+Your core pitch: "The 'Zero-Fee Profit Shield' eliminates your merchant processing fees so you can keep 100% of your card revenue. We identify the hidden junk fees (markup, interchange padding, etc.) and wipe them out, so you keep more money for you and your business."
+Ensure you sound like a professional partner, not a generic service.
+Keep it under 120 words. Soft CTA (reply-based) only.`,
     schema: { subjectLine: "string", body: "string", strategy: "string" }
   },
   FOLLOW_UP: {
@@ -25,14 +25,14 @@ Maintain the same helpful tone. Keep it even shorter than the first email (<100 
     schema: { subjectLine: "string", body: "string", angle: "string" }
   },
   CLIENT_UPDATE: {
-    system: `Write a status update for an existing client. 
-Highlight progress, mention a "win" (e.g. "We just finished your services overview and it looks great"), and outline next steps.
-Build confidence and maintain excitement.`,
+    system: `Write a status update for an existing client regarding their Profit Shield implementation. 
+Highlight progress, mention a "win" (e.g. "We've successfully audited your last 3 monthly statements and identified $840 in redundant fees"), and outline next steps for activation.
+Build confidence and maintain momentum.`,
     schema: { subjectLine: "string", body: "string", milestone: "string" }
   },
   NEWSLETTER_SNIPPET: {
-    system: `Write a short, value-driven newsletter snippet or "AI Insight" for a lead.
-Explain a complex AI or Web concept in simple terms and how it helps their specific industry.`,
+    system: `Write a short, value-driven "Profit Insight" snippet.
+Explain a merchant processing concept (e.g., Interchange-Plus, PCI Compliance, or Fee Padding) in simple terms and how it impacts their industry's bottom line.`,
     schema: { title: "string", content: "string", industryRelevance: "string" }
   }
 };

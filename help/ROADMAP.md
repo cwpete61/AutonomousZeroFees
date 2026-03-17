@@ -1,21 +1,21 @@
 # 🛸 Project Roadmap
 
-The long-term vision for the Orbis Outreach autonomous web agency.
+The long-term vision for the Profit Shield AI autonomous merchant recovery platform.
 
-## Phase 4: Sales Automation & Credibility
-- **Design Preview Agent**: Automatically generates a "Blurred Redesign Preview" of the target's current homepage using AI to show what a modern version could look like.
-- **Proposal Generator**: Dynamically builds PDF proposals with audit scores and pricing.
-- **Stripe Integration**: Automated invoice generation upon lead acceptance.
+## Phase 4: Financial Automation & Auditing
+- **Profit Audit Agent**: Automatically generates a "Profit Recovery Report" for the target using transaction volume heuristics and industry benchmarks.
+- **Agreement Generator**: Dynamically builds digital activation agreements with compliance guarantees and pricing.
+- **Stripe Connect Integration**: Automated setup of merchant processing accounts and revenue sharing.
 
-## Phase 5: Autonomous Fulfillment
-- **Web Build Agent**: A specialized worker that takes a qualified lead's data and builds a 1-page landing page draft autonomously.
-- **Client Success Agent**: Handles project handoff and provides automated updates to the client via their dedicated dashboard portal.
+## Phase 5: Autonomous Growth
+- **Growth Agent**: A specialized worker that takes a portion of the reclaimed fee savings and reinvests it into Local SEO and automated lead-gen.
+- **Client Success Agent**: Handles the "Zero-Fee" technical configuration and provides automated weekly recovery summaries.
 
 ## Phase 6: Core Intelligence & Reliability
-- **Content Agent**: Generates ongoing blog and social media assets for the client after the site is delivered.
-- **Code Agent**: Automatically monitors the production site and fixes minor layout shifts or performance regressions.
+- **Compliance Agent**: Monitors the legal landscape (Durbin Amendment, etc.) and automatically updates agent prompts to ensure compliance.
+- **Rate Watcher Agent**: Automatically monitors merchant statements for "Rate Creep" from upstream providers and flags for optimization.
 - **Disaster Recovery**: Implementation of the "dedicated backup runner" to ensure 99.9% agency data uptime.
 
 ## Phase 7: Scaling
-- **Multi-Tenant Support**: Allowing for nested agencies or sub-teams to share the same infrastructure.
-- **Cross-Platform Marketplace**: Integration with Fiverr/Upwork for overflow fulfillment when specialized human intervention is needed.
+- **Multi-Tenant Support**: Allowing for nested recovery agencies or sub-teams to share the same infrastructure.
+- **Enterprise ERP Connector**: Integration with large retail point-of-sale systems for high-volume corporate recovery.

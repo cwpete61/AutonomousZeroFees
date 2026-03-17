@@ -5,8 +5,8 @@ This document details the core capabilities currently active in the Orbis Outrea
 ## 1. The Scout Agent (Discovery Engine)
 The **Scout Agent** is a Playwright-driven autonomous worker that:
 - **Searches**: Scours Google and business directories for leads based on your Niche/Geography.
-- **Audits**: Visually and technically inspects target websites (SEO, Performance, Design).
-- **Scores**: Assigns a "Propensity Score" to each lead, identifying those most likely to need a redesign.
+- **Audits**: Inspects target transaction signals and payment friction.
+- **Scores**: Assigns a "Profit Gap Score," identifying businesses overpaying in credit card fees.
 - **Enriches**: Extracts owner names, business emails, and social media profiles.
 
 ## 2. Multi-LLM Brain (AI Services)
@@ -23,7 +23,7 @@ The API Hub now supports:
 - **Twilio**: SMS and Voice follow-up automation.
 
 ## 4. AutoWriteEmail™
-- **Hyper-Personalization**: Instead of broad templates, the AI uses specific signals (e.g., "Your site takes 4s to load") to write individual emails.
+- **Hyper-Personalization**: Instead of broad templates, the AI uses specific signals (e.g., "Your Interchange setup is inefficient") to write individual emails.
 - **Sequence Generation**: Automatically builds 3-5 step sequences with follow-up delays.
 - **Tone Control**: Support for multiple outreach styles (Friendly, Professional, Aggressive).
 

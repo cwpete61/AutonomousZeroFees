@@ -1,6 +1,6 @@
 # Campaign SOP: Launching the Profit Shield Engine (Orbis Outreach)
 
-The Orbis Outreach Profit Shield is an autonomous engine designed to help local businesses keep more of their hard-earned money. It discovers businesses overpaying in credit card fees, audits their digital presence, and offers to eliminate those fees entirely while bundling a premium website redesign.
+The Orbis Outreach Profit Shield is an autonomous engine designed to help local businesses keep more of their hard-earned money. It discovers businesses overpaying in credit card fees and automates the recovery process, allowing owners to reclaim thousands in lost revenue.
 
 ---
 
@@ -46,7 +46,7 @@ The Orbis Outreach Profit Shield is an autonomous engine designed to help local 
 2.  **Lead Scoring**: As leads are discovered, the machine automatically:
     - **Audits** the website for performance and **Payment Friction**.
     - **Calculates** estimated processing fee waste (money the owner is losing to the bank).
-    - **Qualifies** based on revenue potential and web quality.
+    - **Qualifies** based on revenue potential and transaction signals.
     - **Enriches** contact data (names, emails, LinkedIn).
 3.  **Management Dashboard**: Monitor the **Pipeline** to see leads move from `DISCOVERED` to `QUALIFIED`.
 
@@ -68,7 +68,7 @@ The Orbis Outreach Profit Shield is an autonomous engine designed to help local 
 > **Domain Health**: Do not exceed 50 new outreach starts per domain per day to prevent spam flagging.
 
 > [!IMPORTANT]
-> **Context is King**: The quality of AI emails depends on the **Pain Point Signals** you provide in Phase 2. Use specific signals like "missing tracking pixels" or "404 page errors" for better engagement.
+> **Context is King**: The quality of AI emails depends on the **Pain Point Signals** you provide in Phase 2. Use specific signals like "legacy interchange rates" or "hidden gateway fees" for better engagement.
 
 > [!CAUTION]
 > **Master Sync**: Ensure the Dashboard is in "Sync Online" mode before launching a campaign to ensure all agent data persists correctly to the PostgreSQL cluster.

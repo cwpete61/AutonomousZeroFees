@@ -3,7 +3,7 @@
  * Re-exports all specialist agent classes from their individual packages
  */
 
-const { ScoutAgent, WEBSITE_QUALITY_HEURISTICS } = require('./scout-agent/scout-agent');
+const { ScoutAgent, FINANCIAL_WASTE_HEURISTICS } = require('./scout-agent/scout-agent');
 const { OutreachAgent, EMAIL_SEQUENCES, SOCIAL_CHANNELS } = require('./outreach-agent/outreach-agent');
 const { DesignPreviewAgent } = require('./design-preview-agent/design-preview-agent');
 const { SalesCloseAgent, PRICING } = require('./sales-close-agent/sales-close-agent');
@@ -35,7 +35,7 @@ module.exports = {
     FinanceAgent,
     AuditAgent,
     NurtureAgent,
-    WEBSITE_QUALITY_HEURISTICS,
+    FINANCIAL_WASTE_HEURISTICS,
     EMAIL_SEQUENCES,
     SOCIAL_CHANNELS,
     PRICING,

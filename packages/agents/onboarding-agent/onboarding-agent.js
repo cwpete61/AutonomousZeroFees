@@ -1,25 +1,25 @@
 /**
  * ONBOARDING AGENT
- * Manages the transition from "Paid" to "Building"
- * Automates asset collection, folder setup, and kickoff communication
+ * Manages the transition from "Paid" to "Active Recovery"
+ * Automates document collection, technical setup, and kickoff communication
  */
 
-const ONBOARDING_SYSTEM_PROMPT = `You are a project coordinator for a web design agency.
-Your job is to ensure a smooth kickoff for new clients.
+const ONBOARDING_SYSTEM_PROMPT = `You are a project coordinator for a merchant recovery agency.
+Your job is to ensure a smooth kickoff for new clients activating the 'Zero-Fee Profit Shield'.
 
 Tasks:
-1. Identify missing assets (Logo, brand colors, domain access, hosting info)
-2. Draft a personalized welcome message that feels high-touch
-3. Create a "Build Brief" for the Design and Content agents
+1. Identify missing assets (Recent merchant statements, hardware model numbers, bank details for deposits)
+2. Draft a personalized welcome message that focuses on ROI and profit retention
+3. Create an 'Activation Brief' for the technical team
 
 Return JSON:
 {
   "welcomeMessage": "string",
   "missingAssets": ["array"],
-  "buildBrief": {
+  "activationBrief": {
     "primaryGoal": "string",
-    "designStyle": "string",
-    "suggestedPages": ["array"]
+    "recoveryTarget": "string",
+    "suggestedUpgrades": ["array"]
   }
 }`;
 
@@ -32,7 +32,7 @@ class OnboardingAgent {
      * Start the onboarding process for a new client
      */
     async startOnboarding(client) {
-        console.log(`[Onboarding] Starting project for ${client.name}`);
+        console.log(`[Onboarding] Starting Profit Shield activation for ${client.name}`);
 
         // 1. Setup project structure (Mock)
         const projectFolder = `clients/${client.id}_${client.name.replace(/\s+/g, '_').toLowerCase()}`;
@@ -45,21 +45,20 @@ class OnboardingAgent {
             projectFolder,
             welcomeEmail: instructions.welcomeMessage,
             todoList: instructions.missingAssets,
-            brief: instructions.buildBrief,
-            status: 'started',
+            brief: instructions.activationBrief,
+            status: 'shield_activating',
             createdAt: new Date().toISOString()
         };
     }
 
     async generateInstructions(client) {
-        // Fallback or LLM call here
         return {
-            welcomeMessage: `Hi ${client.contactName || 'there'},\n\nWe're thrilled to start on the ${client.name} project! I've set up your project portal. To get moving, could you send over your latest logo and any specific brand colors you'd like us to use?\n\nLooking forward to it!`,
-            missingAssets: ['Logo (SVG/PNG)', 'Brand Colors', 'Hosting Login'],
-            buildBrief: {
-                primaryGoal: 'Conversion-focused redesign',
-                designStyle: 'Modern, clean, local-service oriented',
-                suggestedPages: ['Home', 'Services', 'About', 'Contact', 'Gallery']
+            welcomeMessage: `Hi ${client.contactName || 'there'},\n\nWe're thrilled to activate the Profit Shield for ${client.name}! This is the first step toward reclaiming your profit and scale. To finalize the activation, could you please upload your most recent merchant processing statement and the model number of your current terminal?\n\nWe'll have you live and saving money within 48 hours!`,
+            missingAssets: ['Most recent merchant statement (PDF)', 'Current POS/Terminal model number', 'Bank account info for daily deposits'],
+            activationBrief: {
+                primaryGoal: '100% processing fee elimination',
+                recoveryTarget: client.estimatedAnnualWaste || 'Estimated $5,000+',
+                suggestedUpgrades: ['Zero-Fee Dual Pricing', 'Automated Daily Recovery Reports']
             }
         };
     }

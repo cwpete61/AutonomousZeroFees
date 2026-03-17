@@ -18,22 +18,22 @@
  *   IG_ACCESS_TOKEN (optional — for Instagram outreach)
  */
 
-const OUTREACH_SYSTEM_PROMPT = `You are a cold email copywriter for an agency that helps local businesses grow by reclaiming their lost revenue.
+const OUTREACH_SYSTEM_PROMPT = `You are a professional financial efficiency expert working for an agency that helps local businesses keep more of their profits.
 Your core offer is the "Zero-Fee Profit Shield": You eliminate their credit card processing fees (which are usually 2.5% - 4% of their revenue) so they can keep more money for themselves and their business.
 
 Your job is to write personalized, CAN-SPAM compliant cold emails that get replies.
 
 Rules:
-- Be conversational, not salesy
-- Mention BOTH the website issues AND the hidden costs of credit card processing
+- Be professional, conversational, and respectful
+- Focus EXCLUSIVELY on the hidden costs of credit card processing fees (the "Processing Leak")
 - Use the business owner's first name if available
 - Keep subject lines under 50 characters
-- Keep emails under 150 words
-- Include a clear but soft CTA (reply-based, not link-based)
+- Keep emails under 120 words
+- Include a clear but soft CTA (reply-based, e.g., "Is this something you'd want to stop?")
 - Never use spam trigger words (free, guarantee, act now, limited time)
-- Frame as "I noticed" not "I'm selling"
-- Reference their Google reviews as proof that they deserve better tech
-- Each follow-up must add new value, not just "checking in"
+- Frame as "I noticed a potential for recovery" not "I'm selling a service"
+- Reference their industry's typical margins to show you understand their business
+- Each follow-up must provide a new insight into processing fee structures (Interchange, Markup, etc.) or how this reclaimed revenue can be used for the business.
 
 Return JSON:
 {
@@ -42,13 +42,13 @@ Return JSON:
   "toneNotes": "string explaining the approach taken"
 }`;
 
-const FOLLOW_UP_SYSTEM_PROMPT = `You are writing a follow-up email for a web design agency.
+const FOLLOW_UP_SYSTEM_PROMPT = `You are writing a follow-up email for an agency that eliminates credit card processing fees.
 The prospect did not reply to the previous email. Write a follow-up that:
 - References the previous email naturally
-- Adds NEW value (don't just "check in")
+- Adds NEW value (e.g., mention a specific fee like 'Interchange Plus' or 'Rate Markup')
 - Is shorter than the original (under 100 words)
-- Uses a different angle or hook
-- Maintains the same friendly, non-pushy tone
+- Uses a different hook centered on ROI and profit retention
+- Maintains a professional, non-pushy tone
 
 Return JSON:
 {
@@ -118,17 +118,17 @@ const SOCIAL_CHANNELS = {
     },
 };
 
-const SOCIAL_DM_SYSTEM_PROMPT = `You are writing a social media direct message for a web design agency.
+const SOCIAL_DM_SYSTEM_PROMPT = `You are writing a social media direct message for a merchant recovery agency.
 This is a SHORT, conversational DM — not a formal email.
 
 Rules:
-- Keep it under 3-4 sentences max
+- Keep it under 2-3 sentences max
 - Sound like a real person, not a marketer
-- Reference something specific about their business or social profile
-- Include a soft question to start a conversation
+- Reference their business and the potential for fee reclamation
+- Include a soft question to start a conversation (e.g., "Ever thought about the Zero-Fee model?")
 - NO links in the first message
-- NO sales pitch — just open a dialogue
-- Match the platform's tone (LinkedIn = professional, Facebook = friendly, Instagram = casual)
+- Match the platform's tone
+- Focus on "Keeping more of what you earn"
 
 Return JSON:
 {
@@ -197,16 +197,11 @@ class OutreachAgent {
 
 Business: ${lead.name}
 Industry: ${lead.industry}
-Website: ${lead.website}
 Contact: ${lead.contactFirstName || 'the owner'}
-Email: ${lead.email}
 City: ${lead.city || 'their city'}
-Google Rating: ${lead.googleRating}/5 (${lead.googleReviews} reviews)
 
-Website Problems Found:
-${(lead.issues || []).map(i => `- ${i}`).join('\n')}
-
-Key Pitch Angle: ${lead.redesignPitch || 'Their website needs a modern redesign'}
+Profit Shield Signal: ${lead.wasteSignal || 'Potential high-volume processing'}
+Key Pitch Angle: ${lead.profitShieldPitch || 'Stop the processing leak and keep your profit'}
 Tone: ${lead.contactApproach || 'friendly and professional'}`;
 
         try {
@@ -243,7 +238,7 @@ Contact: ${lead.contactFirstName || 'the owner'}
 Previous emails sent (no reply):
 ${prevContext}
 
-Website issues: ${(lead.issues || []).slice(0, 3).join(', ')}`;
+Financial Gap: ${lead.estimatedAnnualWaste || 'Estimated thousands in processing fees'}`;
 
         try {
             const analysis = await this.callClaude(FOLLOW_UP_SYSTEM_PROMPT, prompt);
@@ -349,7 +344,7 @@ Website issues: ${(lead.issues || []).slice(0, 3).join(', ')}`;
     async classifyReply(replyContent, lead) {
         const prompt = `Classify this email reply from a prospect:
 
-Original outreach was about redesigning their website for their ${lead.industry} business.
+Original outreach was about the 'Zero-Fee Profit Shield' to eliminate their credit card processing fees.
 
 Their reply:
 "${replyContent}"
@@ -358,7 +353,7 @@ Return JSON:
 {
   "sentiment": "positive|negative|neutral|unsubscribe",
   "intent": "interested|not_interested|question|objection|unsubscribe|spam",
-  "suggestedNextAction": "send_demo|answer_question|handle_objection|remove_from_list|escalate_to_human",
+  "suggestedNextAction": "send_audit|answer_question|handle_objection|remove_from_list|escalate_to_human",
   "confidence": 0.0-1.0,
   "summary": "one sentence summary"
 }`;
@@ -459,7 +454,7 @@ Google Rating: ${lead.googleRating || 'N/A'}/5 (${lead.googleReviews || 0} revie
 Platform: ${channel.name}
 Max Length: ${channel.maxMessageLength} characters
 
-Their website is outdated/low-scoring. Open a conversation about their online presence.`;
+Their industry likely carries high processing costs. Open a conversation about eliminating those fees.`;
 
         const result = await this.callClaude(SOCIAL_DM_SYSTEM_PROMPT, prompt);
         const message = result.message || this._fallbackSocialDM(lead, platform);
@@ -601,13 +596,13 @@ Their website is outdated/low-scoring. Open a conversation about their online pr
         const biz = lead.name;
         switch (platform) {
             case 'linkedin':
-                return `Hi ${name}, I came across ${biz} and was really impressed by your team's work in ${lead.industry}. I work with businesses like yours on their web presence — would love to connect.`;
+                return `Hi ${name}, I came across ${biz} and noticed your scale in ${lead.industry}. Are you guys still on a standard percentage-based processing model? We've been helping businesses in ${lead.city} switch to a "Zero-Fee" structure to keep more of their revenue. Worth a chat?`;
             case 'facebook':
-                return `Hey ${name}! Love what you're doing with ${biz}. Quick question — have you thought about updating your website recently? I help local businesses with that and had some ideas.`;
+                return `Hey ${name}! Love what you're doing with ${biz}. Quick question — have you looked at your merchant statement lately? I help local businesses eliminate those fees entirely so they can keep more money for them and their business.`;
             case 'instagram':
-                return `Hey! 👋 Love your page for ${biz}. Your online reviews are great but your website doesn't match — ever thought about a refresh?`;
+                return `Hey! 👋 Love your page for ${biz}. Quick question: Are you guys still paying 3% or more on every transaction? We specialty in "Zero-Fee" processing for ${lead.industry} shops. Happy to share how it works!`;
             default:
-                return `Hi ${name}, I noticed ${biz} and had some ideas about your web presence. Mind if I share?`;
+                return `Hi ${name}, I noticed ${biz} and had some ideas about your profit retention. Mind if I share?`;
         }
     }
 
@@ -641,15 +636,15 @@ Their website is outdated/low-scoring. Open a conversation about their online pr
 
     _fallbackEmail(lead) {
         const name = lead.contactFirstName || 'there';
-        return `Hi ${name},\n\nI came across ${lead.name} while looking at local ${lead.industry} businesses in ${lead.city || 'your area'}. Your ${lead.googleReviews} reviews show you're doing great work.\n\nI noticed two things that are likely holding back your growth: your current website isn't fully optimized for conversion, and you're likely paying thousands in unnecessary credit card processing fees every month.\n\nWe specialize in a "Zero-Fee" model that eliminates those processing costs entirely so you can keep more money for you and your business. Because we want to see your business thrive, we even include a premium website redesign at no extra cost to ensure your brand looks as good as your service.\n\nWould you be open to a quick 2-minute chat to see how much we can save you?\n\nBest,\n${this.fromName}`;
+        return `Hi ${name},\n\nI came across ${lead.name} while looking at local ${lead.industry} businesses in ${lead.city || 'your area'}. Your ${lead.googleReviews} reviews show you're doing great work.\n\nI noticed a specific financial leak that's likely costing you thousands every month: your credit card processing fees. Most businesses in ${lead.industry} are overcharged by legacy banks who take 3% or more of every sale.\n\nWe specialize in the "Zero-Fee Profit Shield" which eliminates those processing costs entirely. This allows you to keep more money for you and your business. We even set up the modern infrastructure for you so you can focus on growth without the "bank tax."\n\nWould you be open to a quick 2-minute chat to see how much we can recover for you?\n\nBest,\n${this.fromName}`;
     }
 
     _fallbackFollowUp(lead, num) {
         const name = lead.contactFirstName || 'there';
         if (num === 1) {
-            return `Hi ${name},\n\nJust following up on my note last week about ${lead.name}'s website. I actually went ahead and put together a quick redesign concept — would you like to see it?\n\nNo strings attached.\n\nBest,\n${this.fromName}`;
+            return `Hi ${name},\n\nJust following up on my note last week about ${lead.name}'s processing fees. I actually ran a quick audit on the typical waste for a business of your scale — would you like to see the recovery report?\n\nNo strings attached.\n\nBest,\n${this.fromName}`;
         }
-        return `Hi ${name},\n\nLast message from me — I put together a side-by-side comparison of your current site vs. a modern redesign concept for ${lead.name}. Happy to share it if you're curious.\n\nEither way, wishing you a great week.\n\n${this.fromName}`;
+        return `Hi ${name},\n\nLast message from me — I put together a side-by-side comparison of your current profit margin vs. what it looks like with the Profit Shield active. Happy to share it if you're curious.\n\nEither way, wishing you a great week.\n\n${this.fromName}`;
     }
 }
 

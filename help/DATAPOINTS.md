@@ -1,30 +1,30 @@
 # 📊 Real-Time Data Tracking (Datapoints)
 
-Orbis Outreach is designed to move from "Sample Mode" to "Production Mode" by tracking live metrics across the lead lifecycle.
+Profit Shield AI is designed to move from "Sample Mode" to "Production Mode" by tracking live metrics across the merchant recovery lifecycle.
 
 ## 1. Technical Datapoints
 Every lead discovered by the **Scout Agent** is audited for:
-- **PageSpeed Score**: Core Web Vitals (FCP, LCP, CLS) from Google PageSpeed Insights.
-- **GTMetrix Grade**: Performance and Structure scores for deep technical auditing.
-- **Pingdom Response**: Global latency and uptime checks.
-- **SSL Status**: Binary check for secure connections.
+- **Payment Friction**: Detecting manual invoicing, lack of pay-links, and legacy terminals.
+- **Transaction Volume Signals**: AI-estimated processing volume based on industry, review frequency, and location.
+- **Legacy Stack**: Identification of older POS hardware or gateway integrations.
+- **Industry Margin Sensitivity**: Calculating the impact of a 3% fee reduction on the business's net profit.
 
 ## 2. Lead Qualification Datapoints
-We use a weighted **Qualification Score (0-100)**:
-- **LOWER SCORE = BETTER LEAD**: This represents "Bad Website Quality" which makes the business a prime candidate for a redesign.
-- **Signals**: Outdated copyright dates, non-responsive layouts, slow mobile speed, and poor CTA visibility.
+We use a weighted **Profit Gap Score (0-100)**:
+- **LOWER SCORE = BETTER LEAD**: This represents a high "Profit Leak" where the business is overpaying legacy banks.
+- **Signals**: High daily transaction count, no automated recurring billing, and lack of integrated online payments.
 
 ## 3. Communication Datapoints
 The **Outreach Agent** tracks:
 - **Email Open Rates**: (Tracked via Instantly/Resend webhooks).
-- **Reply Sentiment**: AI-classified sentiment (Positive, Negative, Unsubscribe).
+- **Reply Sentiment**: AI-classified sentiment (Interested, Objection, Question).
 - **Reply Velocity**: Days from outreach to first response.
-- **Engagement Time**: Seconds spent viewing the "Blurred Redesign Preview."
+- **Audit Views**: Tracking when a prospect views their custom "Profit Recovery Report."
 
 ## 4. Financial Datapoints
-- **Budget Tiers**: AI-estimated budget based on business size and location.
-- **Conversion Velocity**: Days from Discovery to Payment.
-- **ROI Factor**: Projected lead jump for the client post-redesign.
+- **Annual Waste Estimate**: The projected amount of capital being lost to unnecessary fees.
+- **Recovery Potential**: The net profit jump for the client after "Zero-Fee" activation.
+- **Reinvestment Budget**: The capital reclaimed that can be used to fund digital growth.
 
 ---
 
@@ -32,7 +32,7 @@ The **Outreach Agent** tracks:
 To begin tracking these datapoints for real leads:
 1.  **Fill API Keys**: Update your [**.env**](file:///c:/Antigravity/AutonomousZeroFees/.env) with real Google, Hunter, and Instantly keys.
 2.  **Launch Campaign**: Use the **Campaign Wizard** in the dashboard to start a search in a specific city/industry.
-3.  **Approve Sequences**: Review the generated sequences in the **Approvals** tab.
+3.  **Approve Recovery Audits**: Review the generated audits in the **Approvals** tab.
 
 > [!NOTE]
-> The "Sample Data" that was previously in the dashboard has been completely removed. The app is now in a fresh state, ready for your first production campaign.
+> The app is now in a fresh state, ready for your first "Profit Shield" production campaign. All legacy website-design samples have been removed.

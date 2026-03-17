@@ -153,7 +153,7 @@ class InstantlyClient {
                     google_rating: lead.googleRating || '',
                     google_reviews: lead.googleReviews || '',
                     score: lead.score || '',
-                    redesign_pitch: lead.redesignPitch || '',
+                    profit_shield_pitch: lead.profitShieldPitch || '',
                     ...(lead.customVariables || {}),
                 },
             })),
