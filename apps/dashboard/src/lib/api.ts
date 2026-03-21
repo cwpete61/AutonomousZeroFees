@@ -1,6 +1,6 @@
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:40001";
-console.log('[Dashboard] Using API_BASE_URL:', API_BASE_URL);
+console.log("[Dashboard] Using API_BASE_URL:", API_BASE_URL);
 const DEFAULT_EMAIL =
   process.env.NEXT_PUBLIC_DEFAULT_EMAIL || "owner@agency.com";
 const DEFAULT_PASSWORD =
@@ -62,16 +62,47 @@ export async function apiFetch(endpoint: string, options: RequestInit = {}) {
     ? `${API_BASE_URL}${endpoint}`
     : `${API_BASE_URL}/${endpoint}`;
 
+  const isProfileProbe =
+    endpoint.includes("/auth/profile") || endpoint.includes("/auth/me");
+
   try {
     const response = await fetch(url, {
       ...options,
       headers,
     });
 
+    if (response.status === 401 && !isAuthRoute) {
+      // Clear token and retry if we're in dev with auto-creds
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("orbis_token");
+        const newToken = await ensureToken();
+        if (newToken) {
+          const retryHeaders = {
+            ...headers,
+            Authorization: `Bearer ${newToken}`,
+          };
+          const retryResp = await fetch(url, {
+            ...options,
+            headers: retryHeaders,
+          });
+          if (retryResp.ok) {
+            const text = await retryResp.text();
+            return text ? JSON.parse(text) : null;
+          }
+          // Fail through to standard error handling
+        }
+      }
+    }
+
     if (!response.ok) {
       const error = await response
         .json()
         .catch(() => ({ message: "API Request failed" }));
+
+      if (response.status === 401 && isProfileProbe) {
+        return null;
+      }
+
       throw new Error(
         error.message || `HTTP error! status: ${response.status}`,
       );
